@@ -1,8 +1,5 @@
 #pragma once
 
-#include "stdafx.h"
-using namespace DirectX;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: D3DDevice
 ////////////////////////////////////////////////////////////////////////////////
@@ -15,16 +12,6 @@ public:
 
 	bool Initialize(int, int, bool, HWND, bool, float, float);
 	void Shutdown();
-
-	void BeginScene(float, float, float, float);
-	void EndScene();
-
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
-
-	void GetProjectionMatrix(XMMATRIX&);
-	void GetWorldMatrix(XMMATRIX&);
-	void GetOrthoMatrix(XMMATRIX&);
 
 	void GetVideoCardInfo(char*, int&);
 
@@ -40,7 +27,4 @@ private:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11RasterizerState* m_rasterState;
-	XMMATRIX m_projectionMatrix;
-	XMMATRIX m_worldMatrix;
-	XMMATRIX m_orthoMatrix;
 };

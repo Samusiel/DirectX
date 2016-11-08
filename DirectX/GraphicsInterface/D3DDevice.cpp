@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "../stdafx.h"
 #include "D3DDevice.h"
 
 D3DDevice::D3DDevice()

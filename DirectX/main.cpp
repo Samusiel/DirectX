@@ -1,27 +1,21 @@
 #include "stdafx.h"
-#include "system.h"
+#include "System/App.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	System* system = new System;
 	bool result;
 
-	if (!system)
-	{
-		return 0;
-	}
+	auto& app = System::App::instance();
 
 	// Initialize and run the system object.
-	result = system->Initialize();
-	if (result)
+	result = System::App::instance()->init();
+	if (app)
 	{
-		system->Run();
+		app->run();
 	}
 
 	// Shutdown and release the system object.
-	system->Shutdown();
-	delete system;
-	system = 0;
+	app->shutdown();
 
 	return 0;
 }

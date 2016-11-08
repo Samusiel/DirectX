@@ -10,12 +10,12 @@
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="RenderStates\Camera.cpp" />
     <ClCompile Include="System\Input.cpp" />
-    <ClCompile Include="System\main.cpp" />
-    <ClCompile Include="System\RenderPipeline.cpp" />
-    <ClCompile Include="System\RenderSystem.cpp" />
-    <ClCompile Include="System\System.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="System\App.cpp" />
+    <ClCompile Include="GraphicsInterface\RenderPipeline.cpp" />
+    <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
@@ -28,12 +28,12 @@
     <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="RenderStates\Camera.h" />
     <ClInclude Include="System\Input.h" />
-    <ClInclude Include="System\RenderPipeline.h" />
-    <ClInclude Include="System\RenderSystem.h" />
-    <ClInclude Include="System\System.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="System\App.h" />
+    <ClInclude Include="GraphicsInterface\RenderPipeline.h" />
+    <ClInclude Include="GraphicsInterface\RenderSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />

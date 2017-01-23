@@ -1,22 +1,24 @@
-#include "../stdafx.h"
 #include "Vector3.h"
 
 namespace Math
 {
-
-	Vector3::Vector3()
+	template <class type>
+	Vector3Base<type>::Vector3Base()
 	{
 	}
 
-	Vector3::Vector3(float a, float b, float c) : Vector2(a, b), z(c)
+	template <class type>
+	Vector3Base<type>::Vector3Base(type a, type b, type c) : Vector2Base(a, b), z(c)
 	{
 	}
 
-	Vector3::Vector3(const Vector3& base) : Vector2(base), z(base.z)
+	template <class type>
+	Vector3Base<type>::Vector3Base(const Vector3Base& base) : Vector2Base(base), z(base.z)
 	{
 	}
 
-	Vector3::~Vector3()
+	template <class type>
+	Vector3Base<type>::~Vector3Base()
 	{
 	}
 

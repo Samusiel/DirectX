@@ -1,22 +1,24 @@
-#include "../stdafx.h"
 #include "Vector4.h"
 
 namespace Math
 {
-
-	Vector4::Vector4()
+	template <class type>
+	Vector4Base<type>::Vector4Base()
 	{
 	}
 
-	Vector4::Vector4(float a, float b, float c, float d) : Vector3(a, b, c), w(d)
+	template <class type>
+	Vector4Base<type>::Vector4Base(type a, type b, type c, type d) : Vector3Base(a, b, c), w(d)
 	{
 	}
 
-	Vector4::Vector4(const Vector4& base) : Vector3(base), w(base.z)
+	template <class type>
+	Vector4Base<type>::Vector4Base(const Vector4Base& base) : Vector3Base(base), w(base.z)
 	{
 	}
 
-	Vector4::~Vector4()
+	template <class type>
+	Vector4Base<type>::~Vector4Base()
 	{
 	}
 

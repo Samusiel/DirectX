@@ -2,17 +2,17 @@
 
 namespace Math
 {
-
-	class Vector2
+	template <class type>
+	class Vector2Base
 	{
 	public:
-		Vector2();
-		Vector2(float a, float b);
-		explicit Vector2(const Vector2 & v2);
+		Vector2Base();
+		Vector2Base(type a, type b);
+		Vector2Base(const Vector2Base & v2);
 
-		operator float*();
+		operator type*();
 	public:
-		float x, y;
+		type x, y;
 	};
 
 }

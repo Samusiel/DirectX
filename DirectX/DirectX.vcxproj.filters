@@ -18,6 +18,7 @@
     <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
     <ClCompile Include="System\Result.cpp" />
     <ClCompile Include="System\WinSystem\WinInput.cpp" />
+    <ClCompile Include="System\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
@@ -38,6 +39,8 @@
     <ClInclude Include="GraphicsInterface\RenderSystem.h" />
     <ClInclude Include="System\Result.hpp" />
     <ClInclude Include="System\WinSystem\WinInput.h" />
+    <ClInclude Include="System\Window.hpp" />
+    <ClInclude Include="Math\Defs.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />

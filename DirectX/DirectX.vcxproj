@@ -22,10 +22,18 @@
     <ClCompile Include="GraphicsInterface\ColorShader.cpp" />
     <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
     <ClCompile Include="GraphicsInterface\Graphics.cpp" />
-    <ClCompile Include="Math\Matrix.cpp" />
-    <ClCompile Include="Math\Vector2.cpp" />
-    <ClCompile Include="Math\Vector3.cpp" />
-    <ClCompile Include="Math\Vector4.cpp" />
+    <ClCompile Include="Math\Matrix.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Math\Vector2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderStates\Camera.cpp" />
     <ClCompile Include="System\Result.cpp" />
@@ -38,12 +46,14 @@
     <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
     <ClCompile Include="System\App.cpp" />
     <ClCompile Include="System\WinSystem\WinInput.cpp" />
+    <ClCompile Include="System\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
     <ClInclude Include="GraphicsInterface\D3DDevice.h" />
     <ClInclude Include="GraphicsInterface\Graphics.h" />
     <ClInclude Include="Math\Constants.h" />
+    <ClInclude Include="Math\Defs.h" />
     <ClInclude Include="Math\Matrix.h" />
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector3.h" />
@@ -58,6 +68,7 @@
     <ClInclude Include="GraphicsInterface\RenderSystem.h" />
     <ClInclude Include="System\App.h" />
     <ClInclude Include="System\WinSystem\WinInput.h" />
+    <ClInclude Include="System\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />

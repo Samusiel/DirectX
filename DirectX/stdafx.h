@@ -13,8 +13,6 @@
 #include <vector>
 
 #include "directxmath.h"
-#include "Math/Vector2.h"
-#include "Math/Vector3.h"
-#include "Math/Vector4.h"
+#include "Math/Defs.h"
 #include "Math/Matrix.h"
 #include "System/Result.hpp"

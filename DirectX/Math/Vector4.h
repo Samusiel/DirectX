@@ -3,19 +3,20 @@
 
 namespace Math
 {
+	template <class type>
+	class Vector3Base;
 
-	class Vector3;
-
-	class Vector4 : public Vector3
+	template <class type>
+	class Vector4Base : public Vector3Base<type>
 	{
 	public:
-		Vector4();
-		Vector4(float a, float b, float c, float d);
-		Vector4(const Vector4& base);
-		virtual ~Vector4();
+		Vector4Base();
+		Vector4Base(type a, type b, type c, type d);
+		Vector4Base(const Vector4Base& base);
+		virtual ~Vector4Base();
 
 	public:
-		float w;
+		type w;
 	};
 
 }

@@ -1,54 +1,144 @@
 #include "../stdafx.h"
 #include "Input.h"
 
-Input::Input()
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Device
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+namespace System
 {
-}
 
-
-Input::Input(const Input& other)
-{
-}
-
-
-Input::~Input()
-{
-}
-
-
-void Input::Initialize()
-{
-	int i;
-
-
-	// Initialize all the keys to being released and not pressed.
-	for (i = 0; i < 256; i++)
+	Input::Device::Device(Input &input) :
+		input(input)
 	{
-		m_keys[i] = false;
+
 	}
 
-	return;
-}
+	Input::Device::~Device()
+	{
+
+	}
+
+	Result Input::Device::Initialize()
+	{
+		return Result(NotImplemented);
+	}
+
+	void Input::Device::Update()
+	{
+
+	}
 
 
-void Input::KeyDown(unsigned int input)
-{
-	// If a key is pressed then save that state in the key array.
-	m_keys[input] = true;
-	return;
-}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Keyboard
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
+	Input::Keyboard::Keyboard(Input &input) :
+		Input::Device(input)
+	{
+		memset(&this->m_vkeyState,  0x00, sizeof(this->m_vkeyState));
+		memset(&this->m_vkeyToCode, 0xff, sizeof(this->m_vkeyToCode));
+		memset(&this->m_codeToVKey, 0xff, sizeof(this->m_codeToVKey));
+		memset(&this->m_inputQueue, 0xff, sizeof(this->m_inputQueue));
+		this->m_inputQueueSize = 0;
+	}
+
+	Input::Keyboard::~Keyboard()
+	{
+
+	}
+
+	Result Input::Keyboard::Initialize()
+	{
+		return Result(NotImplemented);
+	}
 
 
-void Input::KeyUp(unsigned int input)
-{
-	// If a key is released then clear that state in the key array.
-	m_keys[input] = false;
-	return;
-}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Mouse
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Input::Mouse::Mouse(Input &input) :
+		Input::Device(input)
+	{
+		this->m_lbState = KeyState::Up;
+		this->m_mbState = KeyState::Up;
+		this->m_rbState = KeyState::Up;
+		this->m_wheelDelta = 0;
+	}
+
+	Input::Mouse::~Mouse()
+	{
+
+	}
+
+	Result Input::Mouse::Initialize()
+	{
+		return Result(NotImplemented);
+	}
 
 
-bool Input::IsKeyDown(unsigned int key)
-{
-	// Return what state the key is in (pressed/not pressed).
-	return m_keys[key];
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Gamepad
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Input::Gamepad::Gamepad(Input &input) :
+		Input::Device(input)
+	{
+
+	}
+
+	Input::Gamepad::~Gamepad()
+	{
+
+	}
+
+	Result Input::Gamepad::Initialize()
+	{
+		return Result(NotImplemented);
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Input
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Input::Input()
+	{
+
+	}
+
+	Input::~Input()
+	{
+
+	}
+
+	Result Input::Initialize()
+	{
+		return Result(NotImplemented);
+	}
+
+	void Input::Update()
+	{
+		// update all devices
+
+		if (this->keyboard.get() != nullptr)
+		{
+			this->keyboard->Update();
+		}
+
+		if (this->mouse.get() != nullptr)
+		{
+			this->mouse->Update();
+		}
+
+		for (size_t idx = 0; idx < Gamepad::MaxConnected; ++idx)
+		{
+			if (this->gamepad[idx].get() != nullptr)
+			{
+				this->gamepad[idx]->Update();
+			}
+		}
+	}
+
 }

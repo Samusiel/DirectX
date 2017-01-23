@@ -16,6 +16,8 @@
     <ClCompile Include="System\App.cpp" />
     <ClCompile Include="GraphicsInterface\RenderPipeline.cpp" />
     <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
+    <ClCompile Include="System\Result.cpp" />
+    <ClCompile Include="System\WinSystem\WinInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
@@ -34,6 +36,8 @@
     <ClInclude Include="System\App.h" />
     <ClInclude Include="GraphicsInterface\RenderPipeline.h" />
     <ClInclude Include="GraphicsInterface\RenderSystem.h" />
+    <ClInclude Include="System\Result.hpp" />
+    <ClInclude Include="System\WinSystem\WinInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />
@@ -45,5 +49,6 @@
   <ItemGroup>
     <None Include="Shaders\types_definitions.hlsli" />
     <None Include="RenderStates\Camera.ipp" />
+    <None Include="System\Input.ipp" />
   </ItemGroup>
 </Project>

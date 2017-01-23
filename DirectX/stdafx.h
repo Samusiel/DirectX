@@ -9,9 +9,12 @@
 #include <d3d9.h>
 
 #include <memory>
+#include <algorithm>
+#include <vector>
 
 #include "directxmath.h"
 #include "Math/Vector2.h"
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
 #include "Math/Matrix.h"
+#include "System/Result.hpp"

@@ -28,6 +28,7 @@
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderStates\Camera.cpp" />
+    <ClCompile Include="System\Result.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -36,6 +37,7 @@
     <ClCompile Include="GraphicsInterface\RenderPipeline.cpp" />
     <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
     <ClCompile Include="System\App.cpp" />
+    <ClCompile Include="System\WinSystem\WinInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
@@ -49,11 +51,13 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="RenderStates\Camera.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="System\Result.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="System\Input.h" />
     <ClInclude Include="GraphicsInterface\RenderPipeline.h" />
     <ClInclude Include="GraphicsInterface\RenderSystem.h" />
     <ClInclude Include="System\App.h" />
+    <ClInclude Include="System\WinSystem\WinInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />
@@ -65,6 +69,7 @@
   <ItemGroup>
     <None Include="RenderStates\Camera.ipp" />
     <None Include="Shaders\types_definitions.hlsli" />
+    <None Include="System\Input.ipp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0D70229F-DF35-4D88-A1C7-BF337828C480}</ProjectGuid>

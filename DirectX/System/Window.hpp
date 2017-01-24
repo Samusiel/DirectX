@@ -21,9 +21,9 @@ namespace System
 
 	protected:
 
-		virtual Result OnInitialize(const Math::Rect &bound);
+		virtual Result onInitialize(const Math::Rect &bound);
 
-		virtual Result OnSetBound(const Math::Rect &bound);
+		virtual Result onSetBound(const Math::Rect &bound);
 
 	private:
 

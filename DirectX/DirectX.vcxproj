@@ -39,6 +39,7 @@
     <ClCompile Include="System\Result.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="System\Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -47,6 +48,9 @@
     <ClCompile Include="System\App.cpp" />
     <ClCompile Include="System\WinSystem\WinInput.cpp" />
     <ClCompile Include="System\Window.cpp" />
+    <ClCompile Include="System\WinSystem\WinWindow.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\ColorShader.h" />
@@ -69,6 +73,7 @@
     <ClInclude Include="System\App.h" />
     <ClInclude Include="System\WinSystem\WinInput.h" />
     <ClInclude Include="System\Window.hpp" />
+    <ClInclude Include="System\WinSystem\WinWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />
@@ -159,8 +164,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>

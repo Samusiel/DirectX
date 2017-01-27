@@ -19,9 +19,9 @@ namespace System
 
 			~WinKeyboard();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
-			virtual void Update();
+			virtual void update();
 		};
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,9 +35,9 @@ namespace System
 
 			~WinMouse();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
-			virtual void Update();
+			virtual void update();
 		};
 
 
@@ -45,9 +45,9 @@ namespace System
 
 		virtual ~WinInput();
 
-		virtual Result Initialize();
+		virtual Result initialize();
 
-		virtual void Update();
+		virtual void update();
 
 		void ProcessMsg(const MSG &msg);
 

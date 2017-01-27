@@ -136,11 +136,11 @@ namespace System
 
 			~Device();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
-			virtual void Update();
+			virtual void update();
 
-			inline Input& GetInput();
+			inline Input& getInput();
 
 		private:
 
@@ -158,21 +158,21 @@ namespace System
 
 			virtual ~Keyboard();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
-			inline size_t GetInputQueueSize();
+			inline size_t getInputQueueSize();
 
-			inline KeyCode GetInputQueueChar(size_t idx);
+			inline KeyCode getInputQueueChar(size_t idx);
 
-			inline KeyCode GetKeyCode(VKey vkey);
+			inline KeyCode getKeyCode(VKey vkey);
 
-			inline KeyState GetKeyState(VKey vkey);
+			inline KeyState getKeyState(VKey vkey);
 
-			inline bool IsKeyUp(VKey vkey);
+			inline bool isKeyUp(VKey vkey);
 
-			inline bool IsKeyDown(VKey vkey);
+			inline bool isKeyDown(VKey vkey);
 
-			inline bool IsKeyReleased(VKey vkey);
+			inline bool isKeyReleased(VKey vkey);
 
 		protected:
 
@@ -196,17 +196,17 @@ namespace System
 
 			virtual ~Mouse();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
-			inline const Math::Vector2& GetPos() const;
+			inline const Math::Vector2& getPos() const;
 
-			inline KeyState GetLBState() const;
+			inline KeyState getLBState() const;
 
-			inline KeyState GetMBState() const;
+			inline KeyState getMBState() const;
 
-			inline KeyState GetRBState() const;
+			inline KeyState getRBState() const;
 
-			inline int GetWheelDelta() const;
+			inline int getWheelDelta() const;
 
 		protected:
 
@@ -230,7 +230,7 @@ namespace System
 
 			virtual ~Gamepad();
 
-			virtual Result Initialize();
+			virtual Result initialize();
 
 			// todo: not implemented yet
 		};
@@ -240,21 +240,21 @@ namespace System
 
 		virtual ~Input();
 
-		virtual Result Initialize();
+		virtual Result initialize();
 
-		virtual void Update();
+		virtual void update();
 
-		inline Keyboard* GetKeyboard() const;
+		inline Keyboard* getKeyboard() const;
 
-		inline Mouse* GetMouse() const;
+		inline Mouse* getMouse() const;
 
-		Gamepad* GetGamepad(size_t idx) const;
+		Gamepad* getGamepad(size_t idx) const;
 
 	protected:
 
-		std::unique_ptr<Keyboard> keyboard;
-		std::unique_ptr<Mouse> mouse;
-		std::unique_ptr<Gamepad> gamepad[Gamepad::MaxConnected];
+		std::unique_ptr<Keyboard> m_keyboard;
+		std::unique_ptr<Mouse> m_mouse;
+		std::unique_ptr<Gamepad> m_gamepad[Gamepad::MaxConnected];
 	};
 
 }

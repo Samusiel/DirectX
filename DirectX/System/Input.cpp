@@ -18,12 +18,12 @@ namespace System
 
 	}
 
-	Result Input::Device::Initialize()
+	Result Input::Device::initialize()
 	{
 		return Result(NotImplemented);
 	}
 
-	void Input::Device::Update()
+	void Input::Device::update()
 	{
 
 	}
@@ -48,7 +48,7 @@ namespace System
 
 	}
 
-	Result Input::Keyboard::Initialize()
+	Result Input::Keyboard::initialize()
 	{
 		return Result(NotImplemented);
 	}
@@ -72,7 +72,7 @@ namespace System
 
 	}
 
-	Result Input::Mouse::Initialize()
+	Result Input::Mouse::initialize()
 	{
 		return Result(NotImplemented);
 	}
@@ -93,7 +93,7 @@ namespace System
 
 	}
 
-	Result Input::Gamepad::Initialize()
+	Result Input::Gamepad::initialize()
 	{
 		return Result(NotImplemented);
 	}
@@ -113,30 +113,30 @@ namespace System
 
 	}
 
-	Result Input::Initialize()
+	Result Input::initialize()
 	{
 		return Result(NotImplemented);
 	}
 
-	void Input::Update()
+	void Input::update()
 	{
 		// update all devices
 
-		if (this->keyboard.get() != nullptr)
+		if (this->m_keyboard.get() != nullptr)
 		{
-			this->keyboard->Update();
+			this->m_keyboard->update();
 		}
 
-		if (this->mouse.get() != nullptr)
+		if (this->m_mouse.get() != nullptr)
 		{
-			this->mouse->Update();
+			this->m_mouse->update();
 		}
 
 		for (size_t idx = 0; idx < Gamepad::MaxConnected; ++idx)
 		{
-			if (this->gamepad[idx].get() != nullptr)
+			if (this->m_gamepad[idx].get() != nullptr)
 			{
-				this->gamepad[idx]->Update();
+				this->m_gamepad[idx]->update();
 			}
 		}
 	}

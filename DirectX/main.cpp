@@ -2,6 +2,7 @@
 #include "System/App.h"
 
 #include "System\WinSystem\WinInput.h"
+#include "System\WinSystem\WinWindow.h"
 
 using namespace System;
 
@@ -15,20 +16,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// create realm
-	Realm realm;
-	realm.Initialize();
+	App::instance()->init();
 
 	// create system canvas
 	size_t screenWidth = size_t(GetSystemMetrics(SM_CXSCREEN));
 	size_t screenHeight = size_t(GetSystemMetrics(SM_CYSCREEN));
-	std::unique_ptr<WinCanvas> canvas(new WinCanvas(realm));
-	canvas->Initialize(RectI(0, 0, screenWidth, screenHeight));
-	realm.SetCanvas(std::move(canvas));
+	WinWindow* window = new WinWindow();
+	window->initialize(Math::Rect(0, 0, screenWidth, screenHeight));
+	App::instance()->window(window);
 
 	// create input system
-	std::unique_ptr<WinInput> input(new WinInput(8-89));
-	input->Initialize();
-	realm.SetInput(std::move(input));
+	WinInput* input = new WinInput();
+	input->initialize();
+	App::instance()->input(input);
 
 	// create gfx system
 	std::unique_ptr<GfxSystemD3D11> gfx(new GfxSystemD3D11(realm));

@@ -18,29 +18,29 @@ namespace System
 
 	}
 
-	Result WinInput::Initialize()
+	Result WinInput::initialize()
 	{
 		// initialize keyboard
 
 		std::unique_ptr<WinKeyboard> winKeyboard(new WinKeyboard(*this));
-		if (Succeeded(winKeyboard->Initialize()))
+		if (Succeeded(winKeyboard->initialize()))
 		{
-			this->keyboard = std::move(winKeyboard);
+			this->m_keyboard = std::move(winKeyboard);
 		}
 
 		// initialize mouse
 		std::unique_ptr<WinMouse> winMouse(new WinMouse(*this));
-		if (Succeeded(winMouse->Initialize()))
+		if (Succeeded(winMouse->initialize()))
 		{
-			this->mouse = std::move(winMouse);
+			this->m_mouse = std::move(winMouse);
 		}
 
-		return Result(this->keyboard != nullptr && this->mouse != nullptr ? Success : Failure);
+		return Result(this->m_keyboard != nullptr && this->m_mouse != nullptr ? Success : Failure);
 	}
 
-	void WinInput::Update()
+	void WinInput::update()
 	{
-		Input::Update();
+		Input::update();
 
 		// queue can now be cleared after all devices have processed the accumulated messages
 		this->m_msgQueue.clear();
@@ -169,12 +169,12 @@ namespace System
 
 	}
 
-	Result WinInput::WinKeyboard::Initialize()
+	Result WinInput::WinKeyboard::initialize()
 	{
 		return Result(Success);
 	}
 
-	void WinInput::WinKeyboard::Update()
+	void WinInput::WinKeyboard::update()
 	{
 		this->m_inputQueueSize = 0;
 		for (size_t i = 0; i < (size_t)VKey::Count; ++i)
@@ -184,7 +184,7 @@ namespace System
 				this->m_vkeyState[i] = KeyState::Up;
 		}
 
-		WinInput &winInput = static_cast<WinInput&>(this->GetInput());
+		WinInput &winInput = static_cast<WinInput&>(this->getInput());
 		for (const MSG &msg : winInput.m_msgQueue)
 		{
 			switch (msg.message)
@@ -235,19 +235,19 @@ namespace System
 
 	}
 
-	Result WinInput::WinMouse::Initialize()
+	Result WinInput::WinMouse::initialize()
 	{
 		return Result(Success);
 	}
 
-	void WinInput::WinMouse::Update()
+	void WinInput::WinMouse::update()
 	{
 		if (this->m_lbState == KeyState::Released) this->m_lbState = KeyState::Up;
 		if (this->m_rbState == KeyState::Released) this->m_rbState = KeyState::Up;
 		if (this->m_mbState == KeyState::Released) this->m_mbState = KeyState::Up;
 		this->m_wheelDelta = 0;
 
-		WinInput &winInput = static_cast<WinInput&>(this->GetInput());
+		WinInput &winInput = static_cast<WinInput&>(this->getInput());
 		for (const MSG &msg : winInput.m_msgQueue)
 		{
 			switch (msg.message)

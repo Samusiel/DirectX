@@ -38,6 +38,8 @@
       <Filter>RenderStates</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
+    <ClCompile Include="Graphics\GraphicsSystem.cpp" />
+    <ClCompile Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Model.h" />
@@ -83,6 +85,8 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsInterface\D3DDevice.h" />
+    <ClInclude Include="Graphics\GraphicsSystem.hpp" />
+    <ClInclude Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />

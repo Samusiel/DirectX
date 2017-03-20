@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
+    <ClCompile Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.cpp" />
+    <ClCompile Include="Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="Math\Matrix.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -50,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsInterface\D3DDevice.h" />
+    <ClInclude Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp" />
+    <ClInclude Include="Graphics\GraphicsSystem.hpp" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Defs.h" />
     <ClInclude Include="Math\Matrix.h" />

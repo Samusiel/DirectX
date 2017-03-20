@@ -19,9 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GraphicsInterface\ColorShader.cpp" />
     <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
-    <ClCompile Include="GraphicsInterface\Graphics.cpp" />
     <ClCompile Include="Math\Matrix.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -43,8 +41,6 @@
     </ClCompile>
     <ClCompile Include="System\Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="GraphicsInterface\RenderPipeline.cpp" />
-    <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
     <ClCompile Include="System\App.cpp" />
     <ClCompile Include="System\WinSystem\WinInput.cpp" />
     <ClCompile Include="System\Window.cpp" />
@@ -53,9 +49,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicsInterface\ColorShader.h" />
     <ClInclude Include="GraphicsInterface\D3DDevice.h" />
-    <ClInclude Include="GraphicsInterface\Graphics.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Defs.h" />
     <ClInclude Include="Math\Matrix.h" />
@@ -68,8 +62,6 @@
     <ClInclude Include="System\Result.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="System\Input.h" />
-    <ClInclude Include="GraphicsInterface\RenderPipeline.h" />
-    <ClInclude Include="GraphicsInterface\RenderSystem.h" />
     <ClInclude Include="System\App.h" />
     <ClInclude Include="System\WinSystem\WinInput.h" />
     <ClInclude Include="System\Window.hpp" />
@@ -156,6 +148,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,6 +161,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,6 +177,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -200,6 +195,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

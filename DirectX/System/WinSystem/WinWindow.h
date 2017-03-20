@@ -1,7 +1,8 @@
 #pragma once
 
 #include <windows.h>
-#include "../Window.hpp"
+
+#include "System/Window.hpp"
 
 namespace System
 {

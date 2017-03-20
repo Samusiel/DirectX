@@ -34,24 +34,10 @@
     <ClCompile Include="Math\Matrix.cpp">
       <Filter>Math</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsInterface\Graphics.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsInterface\ColorShader.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsInterface\SystemD3D11.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsInterface\RenderSystem.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsInterface\RenderPipeline.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="RenderStates\Camera.cpp">
       <Filter>RenderStates</Filter>
     </ClCompile>
+    <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Model.h" />
@@ -90,27 +76,13 @@
     <ClInclude Include="Math\Constants.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsInterface\Graphics.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInterface\ColorShader.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInterface\SystemD3D11.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInterface\RenderSystem.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInterface\RenderPipeline.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="RenderStates\Camera.h">
       <Filter>RenderStates</Filter>
     </ClInclude>
     <ClInclude Include="Math\Defs.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsInterface\D3DDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />

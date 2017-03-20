@@ -1,59 +1,157 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="GraphicsInterface\ColorShader.cpp" />
-    <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
-    <ClCompile Include="GraphicsInterface\Graphics.cpp" />
-    <ClCompile Include="Math\Matrix.cpp" />
-    <ClCompile Include="Math\Vector2.cpp" />
-    <ClCompile Include="Math\Vector3.cpp" />
-    <ClCompile Include="Math\Vector4.cpp" />
-    <ClCompile Include="RenderStates\Camera.cpp" />
-    <ClCompile Include="System\Input.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="System\App.cpp" />
-    <ClCompile Include="GraphicsInterface\RenderPipeline.cpp" />
-    <ClCompile Include="GraphicsInterface\RenderSystem.cpp" />
-    <ClCompile Include="System\Result.cpp" />
-    <ClCompile Include="System\WinSystem\WinInput.cpp" />
-    <ClCompile Include="System\Window.cpp" />
-    <ClCompile Include="System\WinSystem\WinWindow.cpp" />
+    <ClCompile Include="System\WinSystem\WinInput.cpp">
+      <Filter>System\WinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="System\WinSystem\WinWindow.cpp">
+      <Filter>System\WinSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Input.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\App.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Result.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Window.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInterface\Graphics.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInterface\ColorShader.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInterface\SystemD3D11.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInterface\RenderSystem.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInterface\RenderPipeline.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStates\Camera.cpp">
+      <Filter>RenderStates</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicsInterface\ColorShader.h" />
-    <ClInclude Include="GraphicsInterface\D3DDevice.h" />
-    <ClInclude Include="GraphicsInterface\Graphics.h" />
-    <ClInclude Include="Math\Constants.h" />
-    <ClInclude Include="Math\Matrix.h" />
-    <ClInclude Include="Math\Vector2.h" />
-    <ClInclude Include="Math\Vector3.h" />
-    <ClInclude Include="Math\Vector4.h" />
-    <ClInclude Include="RenderStates\Camera.h" />
-    <ClInclude Include="System\Input.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="System\App.h" />
-    <ClInclude Include="GraphicsInterface\RenderPipeline.h" />
-    <ClInclude Include="GraphicsInterface\RenderSystem.h" />
-    <ClInclude Include="System\Result.hpp" />
-    <ClInclude Include="System\WinSystem\WinInput.h" />
-    <ClInclude Include="System\Window.hpp" />
-    <ClInclude Include="Math\Defs.h" />
-    <ClInclude Include="System\WinSystem\WinWindow.h" />
+    <ClInclude Include="System\WinSystem\WinInput.h">
+      <Filter>System\WinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="System\WinSystem\WinWindow.h">
+      <Filter>System\WinSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Input.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\App.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Result.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Window.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Constants.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInterface\Graphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInterface\ColorShader.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInterface\SystemD3D11.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInterface\RenderSystem.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInterface\RenderPipeline.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStates\Camera.h">
+      <Filter>RenderStates</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Defs.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\VertexShader.hlsl" />
-    <FxCompile Include="Shaders\PixelShader.hlsl" />
+    <FxCompile Include="Shaders\VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\types_definitions.hlsli" />
-    <None Include="RenderStates\Camera.ipp" />
-    <None Include="System\Input.ipp" />
+    <None Include="System\Input.ipp">
+      <Filter>System</Filter>
+    </None>
+    <None Include="RenderStates\Camera.ipp">
+      <Filter>RenderStates</Filter>
+    </None>
+    <None Include="Shaders\types_definitions.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="System">
+      <UniqueIdentifier>{c8c6c74d-3178-401e-ba83-5f31503ebc13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\WinSystem">
+      <UniqueIdentifier>{b0a0ebf1-7d3a-44e9-8dc4-4ce9dddf7846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{ebb22cf7-c0a9-497f-9261-082b637f015d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{2d2c0a0e-79fd-4b49-a4ec-cb55470e8251}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderStates">
+      <UniqueIdentifier>{a52ec65d-67c9-4f71-ab79-d129a052f358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{8f9fc76f-5842-401b-b888-f40757a4613e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

@@ -20,7 +20,7 @@ namespace System
 
 	inline Input::Gamepad* Input::getGamepad(size_t idx) const
 	{
-		return this->m_gamepad[min(idx, size_t(Input::Gamepad::MaxConnected - 1))].get();
+		return this->m_gamepad[std::min<size_t>(idx, size_t(Input::Gamepad::MaxConnected - 1))].get();
 	}
 
 	inline size_t Input::Keyboard::getInputQueueSize()

@@ -12,7 +12,7 @@ namespace Math
 		Vector2Base<T> Min;
 		Vector2Base<T> Max;
 
-		TRect() : Min(std::numeric_limits<T>::max()), Max(-std::numeric_limits<T>::max()) {}
+		TRect() : Min(std::numeric_limits<int>::max()), Max(std::numeric_limits<int>::min()) {}
 
 		TRect(const TRect<T> &r) : Min(r.Min), Max(r.Max) {}
 

@@ -17,7 +17,7 @@ namespace System
 	Result Window::initialize(const Math::Rect& bound)
 	{
 		if (bound.IsInsideOut())
-			return ResultError(InvalidArgs, "Canvas: failed to initialize because of invalid bounding rect");
+			return Result(InvalidArgs);
 
 		m_bound = bound;
 		return Success;
@@ -43,12 +43,12 @@ namespace System
 
 	}
 
-	Result Window::OnInitialize(const Math::Rect &bound)
+	Result Window::onInitialize(const Math::Rect &bound)
 	{
 
 	}
 
-	Result Window::OnSetBound(const Math::Rect &bound)
+	Result Window::onSetBound(const Math::Rect &bound)
 	{
 
 	}

@@ -13,14 +13,14 @@ namespace System
 		typedef size_t KeyCode;
 		static const KeyCode InvalidCode = ~KeyCode(0);
 
-		enum class KeyState : byte
+		enum class KeyState : uint8
 		{
 			Up,
 			Down,
 			Released,
 		};
 
-		enum class VKey : byte
+		enum class VKey : uint8
 		{
 			Num0,
 			Num1,

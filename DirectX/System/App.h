@@ -1,21 +1,27 @@
 #pragma once
 
+//-- Forward declarations
+namespace Graphics
+{
+	class GraphicsSystem;
+}
+
 namespace System
 {
-
-	class Graphics;
 	class Input;
-	class RenderSystem;
 	class Window;
+}
 
+namespace System
+{
 	class App;
 	typedef std::unique_ptr<App> AppPtr;
 
 	class App
 	{
 	public:
-		//-- Singleton
-		static AppPtr& instance();
+		//-- private constructor for Singleton Pattern
+		App();
 
 		//-- destructor
 		~App();
@@ -24,30 +30,26 @@ namespace System
 		Result init();
 
 		//-- getters
-		std::unique_ptr<Input>& input() { return m_input; }
-		const std::unique_ptr<Input>& input() const { return m_input; }
+		Input* input() { return m_input.get(); }
+		const Input* input() const { return m_input.get(); }
 
-		std::unique_ptr<RenderSystem>& renderSystem() { return m_renderSystem; }
-		const std::unique_ptr<RenderSystem>& renderSystem() const { return m_renderSystem; }
+		Graphics::GraphicsSystem* GraphicsSystem() { return m_graphicsSystem.get(); }
+		const Graphics::GraphicsSystem* GraphicsSystem() const { return m_graphicsSystem.get(); }
 
-		std::unique_ptr<Window>& window() { return m_window; }
-		const std::unique_ptr<Window>& window() const { return m_window; }
+		Window* window() { return m_window.get(); }
+		const Window* window() const { return m_window.get(); }
 
 		//-- setters
 		void input(Input* input);
 		void window(Window* window);
 
-
+		static App& instance();
 	private:
-		//-- private constructor for Singleton Pattern
-		App();
+		
 		
 	private:
-		static AppPtr m_app;
-
 		std::unique_ptr<Input> m_input;
-		std::unique_ptr<Graphics> m_graphics;
-		std::unique_ptr<RenderSystem> m_renderSystem;
+		std::unique_ptr<Graphics::GraphicsSystem> m_graphicsSystem;
 		std::unique_ptr<Window> m_window;
 	};
 

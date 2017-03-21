@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Input.h"
+#include "System/Input.h"
 
 namespace System
 {

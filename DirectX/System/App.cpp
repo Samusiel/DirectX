@@ -1,32 +1,26 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "App.h"
-#include "../GraphicsInterface/Graphics.h"
 #include "Input.h"
+#include "Graphics/GraphicsSystem.hpp"
+#include "Window.hpp"
 
 namespace System
 {
 	//-----------------------------------------------------------------------------------------------------
-	AppPtr App::m_app = nullptr;
-
-	//-----------------------------------------------------------------------------------------------------
-	AppPtr& App::instance()
+	App& App::instance()
 	{
-		if (m_app == nullptr)
-		{
-			m_app = std::make_unique<App>();
-		}
-		return m_app;
+		static App s_instance;
+		return s_instance;
 	}
 
 	//-----------------------------------------------------------------------------------------------------
-	App::App() : m_renderSystem(nullptr), m_window(nullptr), m_graphics(nullptr), m_input(nullptr)
+	App::App() : m_graphicsSystem(nullptr), m_window(nullptr), m_input(nullptr)
 	{
 	}
 
 	//-----------------------------------------------------------------------------------------------------
 	App::~App()
 	{
-		m_app = nullptr;
 	}
 
 	//-----------------------------------------------------------------------------------------------------

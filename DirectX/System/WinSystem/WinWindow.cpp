@@ -45,7 +45,7 @@ namespace System
 		// create window
 
 		this->m_hwnd = CreateWindowW(WndClassName, WndTitle, WS_OVERLAPPED | WS_POPUP,
-			bound.x, bound.y, bound.z - bound.x, bound.w - bound.y,
+			bound.Min.x, bound.Min.y, bound.Max.x, bound.Max.y,
 			nullptr, nullptr, this->m_hinst, this);
 		//if (!this->m_hwnd)
 		//	ResultError(Failure, "WinCanvas: failed to create window");
@@ -61,7 +61,7 @@ namespace System
 		if (nullptr == this->m_hwnd)
 			assert(false && NotInitialized && "WinCanvas: trying to move uninitialized windows");
 
-		BOOL res = MoveWindow(this->m_hwnd, bound.x, bound.y, bound.z - bound.x, bound.w - bound.y, FALSE);
+		BOOL res = MoveWindow(this->m_hwnd, bound.Min.x, bound.Min.y, bound.Max.x, bound.Max.y, FALSE);
 
 		return TRUE == res ? Result(Success) : Result(Failure);// ResultError(Failure, "WinCanvas: failed to move window"));
 	}

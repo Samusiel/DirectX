@@ -8,6 +8,11 @@ namespace Math
 	}
 
 	template <class type>
+	Vector4Base<type>::Vector4Base(type a) : Vector3Base(a), w(a)
+	{
+	}
+
+	template <class type>
 	Vector4Base<type>::Vector4Base(type a, type b, type c, type d) : Vector3Base(a, b, c), w(d)
 	{
 	}

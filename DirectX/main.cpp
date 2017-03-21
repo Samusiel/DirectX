@@ -3,8 +3,9 @@
 
 #include "System\WinSystem\WinInput.h"
 #include "System\WinSystem\WinWindow.h"
+#include "Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp"
 
-using namespace System;
+using namespace Graphics;
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -31,34 +32,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	App::instance()->input(input);
 
 	// create Graphics system
-	std::unique_ptr<GraphicsSystemD3D11> Graphics(new GraphicsSystemD3D11(realm));
-	Result res = Graphics->Initialize(realm.GetCanvas());
-	realm.SetGraphicsSystem(std::move(Graphics));
+	std::unique_ptr<GraphicsSystemD3D11> Graphics(new GraphicsSystemD3D11());
+	Result res = Graphics->Initialize(window);
 
 	// create swap chain
 	std::unique_ptr<GraphicsSwapChain> GraphicsSwapChain;
-	if (Succeeded(realm.GetGraphicsSystem()->CreateSwapChain(GraphicsSwapChain)))
+	if (Succeeded(Graphics->CreateSwapChain(GraphicsSwapChain)))
 	{
 		res = GraphicsSwapChain->Initialize(screenWidth, screenHeight);
 	}
 
 	// create Graphics context
 	std::unique_ptr<GraphicsContext> GraphicsContext;
-	if (Succeeded(realm.GetGraphicsSystem()->CreateContext(GraphicsContext)))
+	if (Succeeded(Graphics->CreateContext(GraphicsContext)))
 	{
 		res = GraphicsContext->Initialize();
 	}
 
 	// initialize ImguiRender
-	ImguiRender *imguiRender = ur_null;
-	if (realm.AddComponent<ImguiRender>(realm))
-	{
-		imguiRender = realm.GetComponent<ImguiRender>();
-		res = imguiRender->Init();
-	}
+	//ImguiRender *imguiRender = nullptr;
+	//if (realm.AddComponent<ImguiRender>(realm))
+	//{
+	//	imguiRender = realm.GetComponent<ImguiRender>();
+	//	res = imguiRender->Init();
+	//}
 
 	// initialize GenericRender
-	GenericRender *genericRender = ur_null;
+	GenericRender *genericRender = nullptr;
 	if (realm.AddComponent<GenericRender>(realm))
 	{
 		genericRender = realm.GetComponent<GenericRender>();
@@ -97,16 +97,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		isosurface->Init(std::move(dataVolume), std::move(presentation));
 	}
-
-	// Main message loop:
-	realm.GetLog().WriteLine("Entering main message loop");
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
 	while (msg.message != WM_QUIT)
 	{
 		
 	}
-	realm.GetLog().WriteLine("Left main message loop");
 
 	return 0;//(int)msg.wParam;
 }

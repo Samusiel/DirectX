@@ -8,6 +8,11 @@ namespace Math
 	}
 
 	template <class type>
+	Vector2Base<type>::Vector2Base(type a) : x(a), y(a)
+	{
+	}
+
+	template <class type>
 	Vector2Base<type>::Vector2Base(type a, type b) : x(a), y(b)
 	{
 	}

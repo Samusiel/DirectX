@@ -46,6 +46,9 @@
     <ClCompile Include="Graphics\GraphicsTypes.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Model.h" />
@@ -96,9 +99,14 @@
     <ClInclude Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp">
       <Filter>Graphics\GraphicsD3D11</Filter>
     </ClInclude>
-    <ClInclude Include="System\Types.hpp" />
     <ClInclude Include="Graphics\GraphicsTypes.hpp">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Types.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Math.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@ namespace Math
 	{
 	public:
 		Vector3Base();
+		Vector3Base(type a);
 		Vector3Base(type a, type b, type c);
 		Vector3Base(const Vector3Base& base);
 		virtual ~Vector3Base();

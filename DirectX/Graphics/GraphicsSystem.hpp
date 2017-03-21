@@ -268,9 +268,9 @@ namespace Graphics
 
 		virtual ~GraphicsShader();
 
-		Result Initialize(std::unique_ptr<byte[]> &byteCode, size_t sizeInBytes);
+		Result Initialize(std::unique_ptr<cbyte[]> &byteCode, size_t sizeInBytes);
 
-		inline const byte* GetByteCode() const;
+		inline const cbyte* GetByteCode() const;
 
 		inline size_t GetSizeInBytes() const;
 
@@ -280,7 +280,7 @@ namespace Graphics
 
 	private:
 
-		std::unique_ptr<byte[]> byteCode;
+		std::unique_ptr<cbyte[]> byteCode;
 		size_t sizeInBytes;
 	};
 

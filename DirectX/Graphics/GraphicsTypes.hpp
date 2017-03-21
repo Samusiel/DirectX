@@ -388,8 +388,8 @@ namespace Graphics
 	/************************************************************************/
 	struct GraphicsRenderState
 	{
-		static const uint32 MaxRenderTargets = 8;
-		static const uint32 MaxSamplerStates = 16;
+		static const uint8 MaxRenderTargets = 8;
+		static const uint8 MaxSamplerStates = 16;
 
 		GraphicsPrimitiveTopology PrimitiveTopology;
 		GraphicsSamplerState SamplerState[MaxSamplerStates];

@@ -7,6 +7,7 @@ namespace Math
 	{
 	public:
 		Vector2Base();
+		Vector2Base(type a);
 		Vector2Base(type a, type b);
 		Vector2Base(const Vector2Base & v2);
 

@@ -37,7 +37,7 @@ namespace Graphics
 	}
 
 	//------------------------------------------------------------------------
-	const byte* GraphicsShader::GetByteCode() const
+	const cbyte* GraphicsShader::GetByteCode() const
 	{
 		return this->byteCode.get();
 	}
@@ -200,7 +200,7 @@ namespace Graphics
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsContext::SetScissorRect(const Rect &rect)
+	Result GraphicsContext::SetScissorRect(const Math::Rect &rect)
 	{
 		return Result(NotImplemented);
 	}
@@ -281,7 +281,7 @@ namespace Graphics
 			if (offset + copySize > buffer->GetDesc().Size)
 				return Result(InvalidArgs);
 
-			memcpy((byte*)dstData->Ptr + offset, srcData->Ptr, copySize);
+			memcpy((cbyte*)dstData->Ptr + offset, srcData->Ptr, copySize);
 
 			return Result(Success);
 		};
@@ -545,7 +545,7 @@ namespace Graphics
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsShader::Initialize(std::unique_ptr<byte[]> &byteCode, size_t sizeInBytes)
+	Result GraphicsShader::Initialize(std::unique_ptr<cbyte[]> &byteCode, size_t sizeInBytes)
 	{
 		this->byteCode = std::move(byteCode);
 		this->sizeInBytes = sizeInBytes;

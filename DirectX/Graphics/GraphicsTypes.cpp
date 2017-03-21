@@ -11,7 +11,7 @@ namespace Graphics
 		GraphicsBlendFactor::Zero,			//-- DstBlendAlpha
 		GraphicsBlendOp::Add,				//-- BlendOp
 		GraphicsBlendOp::Add,				//-- BlendOpAlpha
-		ur_byte(GraphicsChannelFlag::All)	//-- RenderTargetWriteMask
+		cbyte(GraphicsChannelFlag::All)	//-- RenderTargetWriteMask
 	};
 
 	const GraphicsDepthStencilOpDesc GraphicsDepthStencilOpDesc::Default = {
@@ -47,7 +47,7 @@ namespace Graphics
 		-std::numeric_limits<float>::max(),	//-- MipLodMin
 		+std::numeric_limits<float>::max(),	//-- MipLodMax
 		1,									//-- MaxAnisotropy;
-		ur_float4(1.0f),					//-- BorderColor
+		Vector4(1.0f),						//-- BorderColor
 		GraphicsCmpFunc::Never				//-- CmpFunc
 	};
 

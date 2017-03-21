@@ -7,10 +7,13 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
 
-namespace Graphics
+namespace System
 {
 	class WinWindow;
+}
 
+namespace Graphics
+{
 	/************************************************************************/
 	/* Direct3D11 graphics system                                           */
 	/************************************************************************/
@@ -44,7 +47,7 @@ namespace Graphics
 
 		virtual Result CreatePipelineState(std::unique_ptr<GraphicsPipelineState> &GraphicsPipelineState);
 
-		inline WinWindow *GetWinCanvas() const;
+		inline WinWindow *GetWinWindow() const;
 
 		inline IDXGIFactory1* GetDXGIFactory() const;
 
@@ -371,7 +374,7 @@ namespace Graphics
 
 	extern D3D11_VIEWPORT GraphicsViewPortToD3D11(const GraphicsViewPort &viewPort);
 
-	extern D3D11_RECT RectIToD3D11(const RectcommandListId &rect);
+	extern D3D11_RECT RectIToD3D11(const Rect &rect);
 
 	extern D3D11_TEXTURE2D_DESC GraphicsTextureDescToD3D11(const GraphicsTextureDesc &desc);
 

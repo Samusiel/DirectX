@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "GraphicsSystemD3D11.hpp"
+#include "System/WinSystem/WinWindow.h"
+#include "Math/Math.hpp"
 
 namespace Graphics
 {
 	//------------------------------------------------------------------------
-	WinWindow *GraphicsSystemD3D11::GetWinCanvas() const
+	WinWindow *GraphicsSystemD3D11::GetWinWindow() const
 	{
 		return this->m_pWindow;
 	}
@@ -142,9 +144,8 @@ namespace Graphics
 
 		if (typeid(*window).hash_code() != typeid(WinWindow).hash_code())
 			return Result(InvalidArgs);
-
-		this->m_pWindow = static_cast<WinWindow*>(window);
-
+		
+		m_pWindow = static_cast<WinWindow*>(window);
 		Result res = this->InitializeDXGI();
 		if (Succeeded(res))
 		{
@@ -371,16 +372,16 @@ namespace Graphics
 	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::SetRenderTarget(GraphicsRenderTarget *rt)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetRenderTarget: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		ID3D11RenderTargetView *rtView[] = { rt != ur_null ?
+		ID3D11RenderTargetView *rtView[] = { rt != nullptr ?
 			static_cast<GraphicsRenderTargetD3D11*>(rt)->GetRTView() :
-			ur_null };
-		ID3D11DepthStencilView *dsView = rt != ur_null ?
+			nullptr };
+		ID3D11DepthStencilView *dsView = rt != nullptr ?
 			static_cast<GraphicsRenderTargetD3D11*>(rt)->GetDSView() :
-			ur_null;
-		this->d3dContext->OMSetRenderTargets(1, rtView, dsView);
+			nullptr;
+		this->m_pD3DContext->OMSetRenderTargets(1, rtView, dsView);
 
 		return Result(Success);
 	}
@@ -388,45 +389,46 @@ namespace Graphics
 	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::SetViewPort(const GraphicsViewPort *viewPort)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetViewPort: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		this->d3dContext->RSSetViewports(1, viewPort != ur_null ?
-			&GraphicsViewPortToD3D11(*viewPort) : ur_null);
+		this->m_pD3DContext->RSSetViewports(1, viewPort != nullptr ?
+			&GraphicsViewPortToD3D11(*viewPort) : nullptr);
 
 		return Result(Success);
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsContextD3D11::SetScissorRect(const RectI *rect)
+	Result GraphicsContextD3D11::SetScissorRect(const Rect *rect)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetScissorRects: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		ur_uint numRects = (rect != ur_null ? 1 : 0);
+		uint32 numRects = (rect != nullptr ? 1 : 0);
 		D3D11_RECT d3dRect;
 		if (numRects > 0) d3dRect = RectIToD3D11(*rect);
-		this->d3dContext->RSSetScissorRects(numRects, (numRects > 0 ? &d3dRect : ur_null));
+		this->m_pD3DContext->RSSetScissorRects(numRects, (numRects > 0 ? &d3dRect : nullptr));
 
 		return Result(Success);
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsContextD3D11::ClearTarget(GraphicsRenderTarget *rt,
-		bool clearColor, const ur_float4 &color,
-		bool clearDepth, const ur_float &depth,
-		bool clearStencil, const ur_uint &stencil)
+	Result GraphicsContextD3D11::ClearTarget(
+		GraphicsRenderTarget *rt,
+		bool clearColor, const Vector4 &color,
+		bool clearDepth, const float &depth,
+		bool clearStencil, const uint32 &stencil)
 	{
 		GraphicsRenderTargetD3D11 *rt_d3d11 = static_cast<GraphicsRenderTargetD3D11*>(rt);
-		if (ur_null == rt_d3d11)
-			return ResultError(Failure, "GraphicsContextD3D11::ClearTarget: failed, invalid render target");
+		if (rt_d3d11 == nullptr)
+			return Result(Failure);
 
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::ClearTarget: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
 		if (clearColor)
 		{
-			this->d3dContext->ClearRenderTargetView(rt_d3d11->GetRTView(), &color.x);
+			m_pD3DContext->ClearRenderTargetView(rt_d3d11->GetRTView(), &color.x);
 		}
 
 		if (clearDepth || clearStencil)
@@ -434,7 +436,7 @@ namespace Graphics
 			UINT flags = 0 |
 				(clearDepth ? D3D11_CLEAR_DEPTH : 0) |
 				(clearStencil ? D3D11_CLEAR_STENCIL : 0);
-			this->d3dContext->ClearDepthStencilView(rt_d3d11->GetDSView(), flags, depth, stencil);
+			m_pD3DContext->ClearDepthStencilView(rt_d3d11->GetDSView(), flags, depth, stencil);
 		}
 
 		return Result(Success);
@@ -443,267 +445,281 @@ namespace Graphics
 	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::SetPipelineState(GraphicsPipelineState *state)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetPipelineState: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
 		GraphicsPipelineStateD3D11 *state_d3d11 = static_cast<GraphicsPipelineStateD3D11*>(state);
-		if (ur_null == state_d3d11)
-			return ResultError(Failure, "GraphicsContextD3D11::ClearTarget: failed, invalid render target");
+		if (state_d3d11 == nullptr)
+			return Result(Failure);
 
-		if (ur_null == state)
+		if (state == nullptr)
 			return Result(InvalidArgs);
 
-		d3dContext->IASetPrimitiveTopology(GraphicsPrimitiveTopologyToD3D11(state_d3d11->GetRenderState().PrimitiveTopology));
+		m_pD3DContext->IASetPrimitiveTopology(GraphicsPrimitiveTopologyToD3D11(state_d3d11->GetRenderState().PrimitiveTopology));
 
-		if (state->InputLayout != ur_null)
+		if (state->InputLayout != nullptr)
 		{
 			GraphicsInputLayoutD3D11 *layout_d3d11 = static_cast<GraphicsInputLayoutD3D11*>(state->InputLayout);
-			d3dContext->IASetInputLayout(layout_d3d11->GetD3DInputLayout());
+			m_pD3DContext->IASetInputLayout(layout_d3d11->GetD3DInputLayout());
 		}
 
 		ID3D11SamplerState *d3dSamplers[GraphicsRenderState::MaxSamplerStates];
-		for (ur_uint i = 0; i < GraphicsRenderState::MaxSamplerStates; ++i)
+		for (uint32 i = 0; i < GraphicsRenderState::MaxSamplerStates; ++i)
 		{
 			d3dSamplers[i] = state_d3d11->GetD3DSamplerState(i);
 		};
 
-		if (state->VertexShader != ur_null)
+		if (state->VertexShader != nullptr)
 		{
 			GraphicsVertexShaderD3D11 *vs_d3d11 = static_cast<GraphicsVertexShaderD3D11*>(state->VertexShader);
-			d3dContext->VSSetShader(vs_d3d11->GetD3DShader(), ur_null, 0);
-			d3dContext->VSSetSamplers(0, GraphicsRenderState::MaxSamplerStates, d3dSamplers);
+			m_pD3DContext->VSSetShader(vs_d3d11->GetD3DShader(), nullptr, 0);
+			m_pD3DContext->VSSetSamplers(0, GraphicsRenderState::MaxSamplerStates, d3dSamplers);
 		}
 
-		if (state->PixelShader != ur_null)
+		if (state->PixelShader != nullptr)
 		{
 			GraphicsPixelShaderD3D11 *ps_d3d11 = static_cast<GraphicsPixelShaderD3D11*>(state->PixelShader);
-			d3dContext->PSSetShader(ps_d3d11->GetD3DShader(), ur_null, 0);
-			d3dContext->PSSetSamplers(0, GraphicsRenderState::MaxSamplerStates, d3dSamplers);
+			m_pD3DContext->PSSetShader(ps_d3d11->GetD3DShader(), nullptr, 0);
+			m_pD3DContext->PSSetSamplers(0, GraphicsRenderState::MaxSamplerStates, d3dSamplers);
 		}
 
-		d3dContext->RSSetState(state_d3d11->GetD3DRasterizerState());
+		m_pD3DContext->RSSetState(state_d3d11->GetD3DRasterizerState());
 
-		d3dContext->OMSetDepthStencilState(state_d3d11->GetD3DDepthStencilState(), (UINT)state_d3d11->GetRenderState().StencilRef);
+		m_pD3DContext->OMSetDepthStencilState(state_d3d11->GetD3DDepthStencilState(), (UINT)state_d3d11->GetRenderState().StencilRef);
 
-		d3dContext->OMSetBlendState(state_d3d11->GetD3DBlendState(), ur_null, 0xffffffff);
-
-		return Result(Success);
-	}
-
-	//------------------------------------------------------------------------
-	Result GraphicsContextD3D11::SetTexture(GraphicsTexture *texture, ur_uint slot)
-	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetConstantBuffer: failed, device context is not ready");
-
-		GraphicsTextureD3D11 *GraphicsTextureD3D11 = static_cast<GraphicsTextureD3D11*>(texture);
-		ur_uint numResources = (GraphicsTextureD3D11 != ur_null ? 1 : 0);
-		ID3D11ShaderResourceView *srvs[] = { GraphicsTextureD3D11 != ur_null ? GraphicsTextureD3D11->GetSRV() : ur_null };
-		this->d3dContext->VSSetShaderResources(slot, numResources, srvs);
-		this->d3dContext->GSSetShaderResources(slot, numResources, srvs);
-		this->d3dContext->HSSetShaderResources(slot, numResources, srvs);
-		this->d3dContext->DSSetShaderResources(slot, numResources, srvs);
-		this->d3dContext->PSSetShaderResources(slot, numResources, srvs);
-		this->d3dContext->CSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->OMSetBlendState(state_d3d11->GetD3DBlendState(), nullptr, 0xffffffff);
 
 		return Result(Success);
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsContextD3D11::SetConstantBuffer(GraphicsBuffer *buffer, ur_uint slot)
+	Result GraphicsContextD3D11::SetTexture(GraphicsTexture *texture, uint32 slot)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetConstantBuffer: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		GraphicsBufferD3D11 *GraphicsBufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
-		ur_uint numBuffers = (GraphicsBufferD3D11 != ur_null ? 1 : 0);
-		ID3D11Buffer* buffers[] = { GraphicsBufferD3D11 != ur_null ? GraphicsBufferD3D11->GetD3DBuffer() : ur_null };
-		this->d3dContext->VSSetConstantBuffers(slot, numBuffers, buffers);
-		this->d3dContext->GSSetConstantBuffers(slot, numBuffers, buffers);
-		this->d3dContext->HSSetConstantBuffers(slot, numBuffers, buffers);
-		this->d3dContext->DSSetConstantBuffers(slot, numBuffers, buffers);
-		this->d3dContext->PSSetConstantBuffers(slot, numBuffers, buffers);
-		this->d3dContext->CSSetConstantBuffers(slot, numBuffers, buffers);
+		GraphicsTextureD3D11 *textureD3D11 = static_cast<GraphicsTextureD3D11*>(texture);
+		uint32 numResources = (textureD3D11 != nullptr ? 1 : 0);
+		ID3D11ShaderResourceView *srvs[] = { textureD3D11 != nullptr ? textureD3D11->GetSRV() : nullptr };
+		m_pD3DContext->VSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->GSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->HSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->DSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->PSSetShaderResources(slot, numResources, srvs);
+		m_pD3DContext->CSSetShaderResources(slot, numResources, srvs);
 
 		return Result(Success);
 	}
 
 	//------------------------------------------------------------------------
-	Result GraphicsContextD3D11::SetVertexBuffer(GraphicsBuffer *buffer, ur_uint slot, ur_uint stride, ur_uint offset)
+	Result GraphicsContextD3D11::SetConstantBuffer(GraphicsBuffer *buffer, uint32 slot)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetVertexBuffer: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		GraphicsBufferD3D11 *GraphicsBufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
-		ur_uint numBuffers = (GraphicsBufferD3D11 != ur_null ? 1 : 0);
-		ID3D11Buffer* buffers[] = { GraphicsBufferD3D11 != ur_null ? GraphicsBufferD3D11->GetD3DBuffer() : ur_null };
-		this->d3dContext->IASetVertexBuffers(slot, numBuffers, buffers, &stride, &offset);
+		GraphicsBufferD3D11 *bufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
+		uint32 numBuffers = (bufferD3D11 != nullptr ? 1 : 0);
+		ID3D11Buffer* buffers[] = { bufferD3D11 != nullptr ? bufferD3D11->GetD3DBuffer() : nullptr };
+		m_pD3DContext->VSSetConstantBuffers(slot, numBuffers, buffers);
+		m_pD3DContext->GSSetConstantBuffers(slot, numBuffers, buffers);
+		m_pD3DContext->HSSetConstantBuffers(slot, numBuffers, buffers);
+		m_pD3DContext->DSSetConstantBuffers(slot, numBuffers, buffers);
+		m_pD3DContext->PSSetConstantBuffers(slot, numBuffers, buffers);
+		m_pD3DContext->CSSetConstantBuffers(slot, numBuffers, buffers);
 
 		return Result(Success);
 	}
 
-	Result GraphicsContextD3D11::SetIndexBuffer(GraphicsBuffer *buffer, ur_uint bitsPerIndex, ur_uint offset)
+	//------------------------------------------------------------------------
+	Result GraphicsContextD3D11::SetVertexBuffer(GraphicsBuffer *buffer, uint32 slot, uint32 stride, uint32 offset)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetIndexBuffer: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
+
+		GraphicsBufferD3D11 *bufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
+		uint32 numBuffers = (bufferD3D11 != nullptr ? 1 : 0);
+		ID3D11Buffer* buffers[] = { bufferD3D11 != nullptr ? bufferD3D11->GetD3DBuffer() : nullptr };
+		m_pD3DContext->IASetVertexBuffers(slot, numBuffers, buffers, &stride, &offset);
+
+		return Result(Success);
+	}
+
+	//------------------------------------------------------------------------
+	Result GraphicsContextD3D11::SetIndexBuffer(GraphicsBuffer *buffer, uint32 bitsPerIndex, uint32 offset)
+	{
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
 		DXGI_FORMAT indexFmt = GraphicsBitsPerIndexToDXGIFormat(bitsPerIndex);
-		if (DXGI_FORMAT_UNKNOWN == indexFmt)
-			return ResultError(Failure, "GraphicsContextD3D11::SetIndexBuffer: invalid bits per index valaue");
+		if (indexFmt == DXGI_FORMAT_UNKNOWN)
+			return Result(Failure);
 
-		GraphicsBufferD3D11 *GraphicsBufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
-		this->d3dContext->IASetIndexBuffer(
-			GraphicsBufferD3D11 != ur_null ? GraphicsBufferD3D11->GetD3DBuffer() : ur_null,
+		GraphicsBufferD3D11 *bufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
+		m_pD3DContext->IASetIndexBuffer(
+			bufferD3D11 != nullptr ? bufferD3D11->GetD3DBuffer() : nullptr,
 			indexFmt, offset);
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::SetVertexShader(GraphicsVertexShader *shader)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetVertexShader: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		GraphicsVertexShaderD3D11 *GraphicsShaderD3D11 = static_cast<GraphicsVertexShaderD3D11*>(shader);
-		this->d3dContext->VSSetShader(
-			GraphicsShaderD3D11 != ur_null ? GraphicsShaderD3D11->GetD3DShader() : ur_null,
-			ur_null, 0);
+		GraphicsVertexShaderD3D11 *shaderD3D11 = static_cast<GraphicsVertexShaderD3D11*>(shader);
+		m_pD3DContext->VSSetShader(
+			shaderD3D11 != nullptr ? shaderD3D11->GetD3DShader() : nullptr,
+			nullptr, 0);
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::SetPixelShader(GraphicsPixelShader *shader)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::SetPixelShader: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		GraphicsPixelShaderD3D11 *GraphicsShaderD3D11 = static_cast<GraphicsPixelShaderD3D11*>(shader);
-		this->d3dContext->PSSetShader(
-			GraphicsShaderD3D11 != ur_null ? GraphicsShaderD3D11->GetD3DShader() : ur_null,
-			ur_null, 0);
+		GraphicsPixelShaderD3D11 *shaderD3D11 = static_cast<GraphicsPixelShaderD3D11*>(shader);
+		m_pD3DContext->PSSetShader(
+			shaderD3D11 != nullptr ? shaderD3D11->GetD3DShader() : nullptr,
+			nullptr, 0);
 
 		return Result(Success);
 	}
 
-	Result GraphicsContextD3D11::Draw(ur_uint vertexCount, ur_uint vertexOffset, ur_uint instanceCount, ur_uint instanceOffset)
+	//------------------------------------------------------------------------
+	Result GraphicsContextD3D11::Draw(uint32 vertexCount, uint32 vertexOffset, uint32 instanceCount, uint32 instanceOffset)
 	{
-		if (this->d3dContext.empty())
+		if (this->m_pD3DContext == nullptr)
 			return Result(Failure);
 
 		if (instanceCount > 0)
 		{
-			this->d3dContext->DrawInstanced((UINT)vertexCount, (UINT)instanceCount, (UINT)vertexOffset, (UINT)instanceOffset);
+			m_pD3DContext->DrawInstanced((UINT)vertexCount, (UINT)instanceCount, (UINT)vertexOffset, (UINT)instanceOffset);
 		}
 		else
 		{
-			this->d3dContext->Draw((UINT)vertexCount, (UINT)vertexOffset);
+			m_pD3DContext->Draw((UINT)vertexCount, (UINT)vertexOffset);
 		}
 
 		return Result(Success);
 	}
 
-	Result GraphicsContextD3D11::DrawIndexed(ur_uint indexCount, ur_uint indexOffset, ur_uint vertexOffset, ur_uint instanceCount, ur_uint instanceOffset)
+	//------------------------------------------------------------------------
+	Result GraphicsContextD3D11::DrawIndexed(uint32 indexCount, uint32 indexOffset, uint32 vertexOffset, uint32 instanceCount, uint32 instanceOffset)
 	{
-		if (this->d3dContext.empty())
+		if (this->m_pD3DContext == nullptr)
 			return Result(Failure);
 
 		if (instanceCount > 0)
 		{
-			this->d3dContext->DrawIndexedInstanced((UINT)indexCount, (UINT)instanceCount, (UINT)indexOffset, (UINT)vertexOffset, (UINT)instanceOffset);
+			m_pD3DContext->DrawIndexedInstanced((UINT)indexCount, (UINT)instanceCount, (UINT)indexOffset, (UINT)vertexOffset, (UINT)instanceOffset);
 		}
 		else
 		{
-			this->d3dContext->DrawIndexed((UINT)indexCount, (UINT)indexOffset, (UINT)vertexOffset);
+			m_pD3DContext->DrawIndexed((UINT)indexCount, (UINT)indexOffset, (UINT)vertexOffset);
 		}
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsContextD3D11::UpdateBuffer(GraphicsBuffer *buffer, GraphicsGPUAccess gpuAccess, bool doNotWait, UpdateBufferCallback callback)
 	{
-		if (this->d3dContext.empty())
-			return ResultError(Failure, "GraphicsContextD3D11::UpdateBuffer: failed, device context is not ready");
+		if (this->m_pD3DContext == nullptr)
+			return Result(Failure);
 
-		GraphicsBufferD3D11 *GraphicsBufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
-		if (ur_null == GraphicsBufferD3D11 || ur_null == GraphicsBufferD3D11->GetD3DBuffer())
-			return ResultError(InvalidArgs, "GraphicsContextD3D11::UpdateBuffer: failed, invalid buffer");
+		GraphicsBufferD3D11 *bufferD3D11 = static_cast<GraphicsBufferD3D11*>(buffer);
+		if (bufferD3D11 == nullptr || bufferD3D11->GetD3DBuffer() == nullptr)
+			return Result(InvalidArgs);
 
 		D3D11_MAP d3dMapType = GraphicsGPUAccessFlagToD3D11(gpuAccess);
 		UINT d3dMapFlags = (doNotWait ? D3D11_MAP_FLAG_DO_NOT_WAIT : 0);
 		D3D11_MAPPED_SUBRESOURCE d3dMappedRes;
-		HRESULT hr = this->d3dContext->Map(GraphicsBufferD3D11->GetD3DBuffer(), 0, d3dMapType, d3dMapFlags, &d3dMappedRes);
+		HRESULT hr = m_pD3DContext->Map(bufferD3D11->GetD3DBuffer(), 0, d3dMapType, d3dMapFlags, &d3dMappedRes);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsContextD3D11::UpdateBuffer: failed to map resource");
+			return Result(Failure);
 
 		GraphicsResourceData GraphicsData;
 		GraphicsData.Ptr = d3dMappedRes.pData;
-		GraphicsData.RowPitch = (ur_uint)d3dMappedRes.RowPitch;
-		GraphicsData.SlicePitch = (ur_uint)d3dMappedRes.DepthPitch;
+		GraphicsData.RowPitch = (uint32)d3dMappedRes.RowPitch;
+		GraphicsData.SlicePitch = (uint32)d3dMappedRes.DepthPitch;
 
 		Result res = callback(&GraphicsData);
 
-		this->d3dContext->Unmap(GraphicsBufferD3D11->GetD3DBuffer(), 0);
+		m_pD3DContext->Unmap(bufferD3D11->GetD3DBuffer(), 0);
 
 		return res;
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsTextureD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
-	GraphicsTextureD3D11::GraphicsTextureD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsTexture(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsTextureD3D11                                                 */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsTextureD3D11::GraphicsTextureD3D11(GraphicsSystem &system) :
+		GraphicsTexture(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsTextureD3D11::~GraphicsTextureD3D11()
 	{
 	}
 
-	Result GraphicsTextureD3D11::Initialize(const GraphicsTextureDesc &desc, shared_ref<ID3D11Texture2D> &d3dTexture)
+	//------------------------------------------------------------------------
+	Result GraphicsTextureD3D11::Initialize(const GraphicsTextureDesc &desc, std::shared_ptr<ID3D11Texture2D> &d3dTexture)
 	{
-		this->d3dTexture.reset(ur_null);
-		this->d3dSRV.reset(ur_null);
+		d3dTexture = nullptr;
+		m_pD3DSRV = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsTextureD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
-		this->d3dTexture.reset(d3dTexture);
+		m_pD3DTexture = nullptr;
 
-		if (desc.BindFlags & ur_uint(GraphicsBindFlag::ShaderResource))
+		if (desc.BindFlags & uint32(GraphicsBindFlag::ShaderResource))
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC d3dSrvDesc;
 			d3dSrvDesc.Format = GraphicsFormatToDXGI(this->GetDesc().Format, this->GetDesc().FormatView);
 			d3dSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			d3dSrvDesc.Texture2D.MipLevels = -1;
 			d3dSrvDesc.Texture2D.MostDetailedMip = 0;
-			HRESULT hr = d3dDevice->CreateShaderResourceView(this->d3dTexture, &d3dSrvDesc, this->d3dSRV);
+			ID3D11ShaderResourceView *pSRV = nullptr;
+			HRESULT hr = d3dDevice->CreateShaderResourceView(m_pD3DTexture.get(), &d3dSrvDesc, &pSRV);
 			if (FAILED(hr))
 			{
-				this->d3dTexture.reset(ur_null);
-				return ResultError(Failure, "GraphicsTextureD3D11: failed to create SRV");
+				m_pD3DTexture = nullptr;
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DSRV.reset( pSRV );
 			}
 		}
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsTextureD3D11::OnInitialize(const GraphicsResourceData *data)
 	{
-		this->d3dTexture.reset(ur_null);
-		this->d3dSRV.reset(ur_null);
+		m_pD3DTexture = nullptr;
+		m_pD3DSRV = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsTextureD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
 		D3D11_SUBRESOURCE_DATA d3dData;
-		D3D11_SUBRESOURCE_DATA *d3dDataPtr = ur_null;
-		if (data != ur_null)
+		D3D11_SUBRESOURCE_DATA *d3dDataPtr = nullptr;
+		if (data != nullptr)
 		{
 			d3dData.pSysMem = data->Ptr;
 			d3dData.SysMemPitch = data->RowPitch;
@@ -713,22 +729,34 @@ namespace Graphics
 
 		D3D11_TEXTURE2D_DESC d3dDesc = GraphicsTextureDescToD3D11(this->GetDesc());
 		d3dDesc.Format = GraphicsFormatToDXGI(this->GetDesc().Format, GraphicsFormatView::Typeless);
-		HRESULT hr = d3dDevice->CreateTexture2D(&d3dDesc, d3dDataPtr, this->d3dTexture);
+		ID3D11Texture2D *pTexture = nullptr;
+		HRESULT hr = d3dDevice->CreateTexture2D(&d3dDesc, d3dDataPtr, &pTexture);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsTextureD3D11: failed to create texture");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pD3DTexture.reset( pTexture );
+		}
 
-		if (this->GetDesc().BindFlags & ur_uint(GraphicsBindFlag::ShaderResource))
+		if (this->GetDesc().BindFlags & uint32(GraphicsBindFlag::ShaderResource))
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC d3dSrvDesc;
 			d3dSrvDesc.Format = GraphicsFormatToDXGI(this->GetDesc().Format, this->GetDesc().FormatView);
 			d3dSrvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			d3dSrvDesc.Texture2D.MipLevels = -1;
 			d3dSrvDesc.Texture2D.MostDetailedMip = 0;
-			hr = d3dDevice->CreateShaderResourceView(this->d3dTexture, &d3dSrvDesc, this->d3dSRV);
+			ID3D11ShaderResourceView *pSRV = nullptr;
+			hr = d3dDevice->CreateShaderResourceView(m_pD3DTexture.get(), &d3dSrvDesc, &pSRV);
 			if (FAILED(hr))
 			{
-				this->d3dTexture.reset(ur_null);
-				return ResultError(Failure, "GraphicsTextureD3D11: failed to create SRV");
+				m_pD3DTexture = nullptr;
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DSRV.reset(pSRV);
 			}
 		}
 
@@ -736,29 +764,31 @@ namespace Graphics
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsRenderTargetD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
-	GraphicsRenderTargetD3D11::GraphicsRenderTargetD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsRenderTarget(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsRenderTargetD3D11                                            */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsRenderTargetD3D11::GraphicsRenderTargetD3D11(GraphicsSystem &system) :
+		GraphicsRenderTarget(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsRenderTargetD3D11::~GraphicsRenderTargetD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsRenderTargetD3D11::OnInitialize()
 	{
-		this->d3dRTView.reset(ur_null);
-		this->d3dDSView.reset(ur_null);
+		m_pD3DRTView = nullptr;
+		m_pD3DDSView = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
 
 		GraphicsTextureD3D11 *d3dTargetBuffer = static_cast<GraphicsTextureD3D11*>(this->GetTragetBuffer());
-		if (d3dTargetBuffer != ur_null)
+		if (d3dTargetBuffer != nullptr)
 		{
 			const GraphicsTextureDesc &bufferDesc = this->GetTragetBuffer()->GetDesc();
 			D3D11_RENDER_TARGET_VIEW_DESC d3dRTViewDesc;
@@ -766,13 +796,20 @@ namespace Graphics
 			d3dRTViewDesc.Format = GraphicsFormatToDXGI(bufferDesc.Format, bufferDesc.FormatView);
 			d3dRTViewDesc.Texture2D.MipSlice = 0;
 
-			HRESULT hr = d3dDevice->CreateRenderTargetView(d3dTargetBuffer->GetD3DTexture(), &d3dRTViewDesc, this->d3dRTView);
+			ID3D11RenderTargetView *pRTView = nullptr;
+			HRESULT hr = d3dDevice->CreateRenderTargetView(d3dTargetBuffer->GetD3DTexture(), &d3dRTViewDesc, &pRTView);
 			if (FAILED(hr))
-				return ResultError(Failure, "GraphicsRenderTargetD3D11: failed to create render target view");
+			{
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DRTView.reset(pRTView);
+			}
 		}
 
 		GraphicsTextureD3D11 *d3dDepthStencilBuffer = static_cast<GraphicsTextureD3D11*>(this->GetDepthStencilBuffer());
-		if (d3dDepthStencilBuffer != ur_null)
+		if (d3dDepthStencilBuffer != nullptr)
 		{
 			const GraphicsTextureDesc &bufferDesc = this->GetDepthStencilBuffer()->GetDesc();
 			D3D11_DEPTH_STENCIL_VIEW_DESC d3dDSViewDesc;
@@ -797,40 +834,50 @@ namespace Graphics
 			d3dDSViewDesc.Flags = 0;
 			d3dDSViewDesc.Texture2D.MipSlice = 0;
 
-			HRESULT hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer->GetD3DTexture(), &d3dDSViewDesc, this->d3dDSView);
+			ID3D11DepthStencilView *pDSView = nullptr;
+			HRESULT hr = d3dDevice->CreateDepthStencilView(d3dDepthStencilBuffer->GetD3DTexture(), &d3dDSViewDesc, &pDSView);
 			if (FAILED(hr))
-				return ResultError(Failure, "GraphicsRenderTargetD3D11: failed to create depth stencil view");
+			{
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DDSView.reset(pDSView);
+			}
 		}
 
 		return Result(Success);
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsSwapChainD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-
-	GraphicsSwapChainD3D11::GraphicsSwapChainD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsSwapChain(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsSwapChainD3D11                                               */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsSwapChainD3D11::GraphicsSwapChainD3D11(GraphicsSystem &system) :
+		GraphicsSwapChain(system)
 	{
 		memset(&this->dxgiChainDesc, 0, sizeof(this->dxgiChainDesc));
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsSwapChainD3D11::~GraphicsSwapChainD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsSwapChainD3D11::Initialize(const GraphicsPresentParams &params)
 	{
-		this->targetBuffer.reset(ur_null);
+		m_pTargetBuffer = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		IDXGIFactory1 *dxgiFactory = d3dSystem.GetDXGIFactory();
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dSystem.GetWinCanvas())
-			return ResultError(NotInitialized, "GraphicsSwapChainD3D11::InitializeRenderTarget: failed, canvas not initialized");
+		auto *window = d3dSystem.GetWinWindow();
+		if (window == nullptr)
+			return Result(NotInitialized);
 
-		this->dxgiChainDesc.OutputWindow = d3dSystem.GetWinCanvas()->GetHwnd();
+		this->dxgiChainDesc.OutputWindow = window->getHwnd();
 		this->dxgiChainDesc.Windowed = !params.Fullscreen;
 		this->dxgiChainDesc.BufferDesc.Width = params.BufferWidth;
 		this->dxgiChainDesc.BufferDesc.Height = params.BufferHeight;
@@ -843,14 +890,23 @@ namespace Graphics
 		this->dxgiChainDesc.SampleDesc.Quality = params.MutisampleQuality;
 		this->dxgiChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-		HRESULT hr = dxgiFactory->CreateSwapChain(d3dDevice, &this->dxgiChainDesc, this->dxgiSwapChain);
+		IDXGISwapChain *pSwapChain = nullptr;
+		HRESULT hr = dxgiFactory->CreateSwapChain(d3dDevice, &this->dxgiChainDesc, &pSwapChain);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsSwapChainD3D11::InitializeRenderTarget: failed to create DXGI swap chain");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pDXGISwapChain.reset(pSwapChain);
+		}
 
-		shared_ref<ID3D11Texture2D> d3dTargetBuffer;
-		hr = this->dxgiSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)d3dTargetBuffer);
+		ID3D11Texture2D *d3dTargetBuffer = nullptr;
+		hr = m_pDXGISwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)d3dTargetBuffer);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsSwapChainD3D11::InitializeRenderTarget: failed to retrieve buffer from swap chain");
+		{
+			return Result(Failure);
+		}
 
 		GraphicsTextureDesc desc;
 		desc.Width = params.BufferWidth;
@@ -859,53 +915,58 @@ namespace Graphics
 		desc.Format = params.BufferFormat;
 		desc.FormatView = GraphicsFormatView::Unorm;
 		desc.Usage = GraphicsUsage::Default;
-		desc.BindFlags = ur_uint(GraphicsBindFlag::RenderTarget);
-		desc.AccessFlags = ur_uint(0);
+		desc.BindFlags = uint32(GraphicsBindFlag::RenderTarget);
+		desc.AccessFlags = uint32(0);
 
-		std::unique_ptr<GraphicsSwapChainD3D11::RenderTarget> newRenderTarget(new RenderTarget(d3dSystem, d3dTargetBuffer));
+		std::unique_ptr<GraphicsSwapChainD3D11::RenderTarget> newRenderTarget(new RenderTarget(d3dSystem, std::shared_ptr<ID3D11Texture2D>(d3dTargetBuffer)));
 		Result res = newRenderTarget->Initialize(desc, params.DepthStencilEnabled, params.DepthStencilFormat);
 		if (Failed(res))
-			return ResultError(res.Code, "GraphicsSwapChainD3D11::InitializeRenderTarget: failed to initialize render target");
+			return Result(res.code());
 
-		this->targetBuffer = std::move(newRenderTarget);
+		m_pTargetBuffer = std::move(newRenderTarget);
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsSwapChainD3D11::Present()
 	{
-		if (this->dxgiSwapChain.empty())
-			return ResultError(NotInitialized, "GraphicsSwapChainD3D11::Present: DXGI swap chain not initialized");
+		if (m_pDXGISwapChain != nullptr)
+			return Result(NotInitialized);
 
-		if (FAILED(this->dxgiSwapChain->Present(0, 0)))
-			return ResultError(Failure, "GraphicsSwapChainD3D11::Present: failed");
+		if (FAILED(m_pDXGISwapChain->Present(0, 0)))
+			return Result(Failure);
 
 		return Result(Success);
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsRenderTarget* GraphicsSwapChainD3D11::GetTargetBuffer()
 	{
-		return this->targetBuffer.get();
+		return m_pTargetBuffer.get();
 	}
 
-	GraphicsSwapChainD3D11::RenderTarget::RenderTarget(GraphicsSystem &GraphicsSystem, shared_ref<ID3D11Texture2D> &dxgiSwapChainBuffer) :
+	//------------------------------------------------------------------------
+	GraphicsSwapChainD3D11::RenderTarget::RenderTarget(GraphicsSystem &GraphicsSystem, std::shared_ptr<ID3D11Texture2D> &dxgiSwapChainBuffer) :
 		GraphicsRenderTargetD3D11(GraphicsSystem),
-		dxgiSwapChainBuffer(dxgiSwapChainBuffer)
+		m_pDXGISwapChainBuffer(dxgiSwapChainBuffer)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsSwapChainD3D11::RenderTarget::~RenderTarget()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsSwapChainD3D11::RenderTarget::InitializeTargetBuffer(std::unique_ptr<GraphicsTexture> &resultBuffer, const GraphicsTextureDesc &desc)
 	{
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 
 		std::unique_ptr<GraphicsTextureD3D11> newTargetBuffer(new GraphicsTextureD3D11(d3dSystem));
-		Result res = newTargetBuffer->Initialize(desc, this->dxgiSwapChainBuffer);
+		Result res = newTargetBuffer->Initialize(desc, m_pDXGISwapChainBuffer);
 		if (Failed(res))
-			return ResultError(res.Code, "GraphicsSwapChainD3D11::RenderTarget::InitializeTargetBuffer: failed");
+			return Result(res.code());
 
 		resultBuffer = std::move(newTargetBuffer);
 
@@ -913,31 +974,33 @@ namespace Graphics
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsBufferD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	GraphicsBufferD3D11::GraphicsBufferD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsBuffer(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsBufferD3D11                                                  */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsBufferD3D11::GraphicsBufferD3D11(GraphicsSystem &system) :
+		GraphicsBuffer(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsBufferD3D11::~GraphicsBufferD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsBufferD3D11::OnInitialize(const GraphicsResourceData *data)
 	{
-		this->d3dBuffer.reset(ur_null);
+		m_pD3DBuffer = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsBufferD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
 		D3D11_SUBRESOURCE_DATA d3dData;
-		D3D11_SUBRESOURCE_DATA *d3dDataPtr = ur_null;
-		if (data != ur_null)
+		D3D11_SUBRESOURCE_DATA *d3dDataPtr = nullptr;
+		if (data != nullptr)
 		{
 			d3dData.pSysMem = data->Ptr;
 			d3dData.SysMemPitch = data->RowPitch;
@@ -945,96 +1008,123 @@ namespace Graphics
 			d3dDataPtr = &d3dData;
 		}
 
+		ID3D11Buffer *pBuffer = nullptr;
 		D3D11_BUFFER_DESC d3dDesc = GraphicsBufferDescToD3D11(this->GetDesc());
-		HRESULT hr = d3dDevice->CreateBuffer(&d3dDesc, d3dDataPtr, this->d3dBuffer);
+		HRESULT hr = d3dDevice->CreateBuffer(&d3dDesc, d3dDataPtr, &pBuffer);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsBufferD3D11: failed to create buffer");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pD3DBuffer.reset(pBuffer);
+		}
 
 		return Result(Success);
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsVertexShaderD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	GraphicsVertexShaderD3D11::GraphicsVertexShaderD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsVertexShader(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsVertexShaderD3D11                                            */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsVertexShaderD3D11::GraphicsVertexShaderD3D11(GraphicsSystem &system) :
+		GraphicsVertexShader(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsVertexShaderD3D11::~GraphicsVertexShaderD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsVertexShaderD3D11::OnInitialize()
 	{
-		this->d3dVertexShader.reset(ur_null);
+		m_pD3DVertexShader = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsVertexShaderD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
-		HRESULT hr = d3dDevice->CreateVertexShader(this->GetByteCode(), this->GetSizeInBytes(), ur_null, this->d3dVertexShader);
+		ID3D11VertexShader *pVertexShader = nullptr;
+		HRESULT hr = d3dDevice->CreateVertexShader(this->GetByteCode(), this->GetSizeInBytes(), nullptr, &pVertexShader);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsVertexShaderD3D11: failed to create shader");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pD3DVertexShader.reset(pVertexShader);
+		}
 
 		return Result(Success);
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsPixelShaderD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	GraphicsPixelShaderD3D11::GraphicsPixelShaderD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsPixelShader(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsPixelShaderD3D11                                             */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsPixelShaderD3D11::GraphicsPixelShaderD3D11(GraphicsSystem &system) :
+		GraphicsPixelShader(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsPixelShaderD3D11::~GraphicsPixelShaderD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsPixelShaderD3D11::OnInitialize()
 	{
-		this->d3dPixelShader.reset(ur_null);
+		m_pD3DPixelShader = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsPixelShaderD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
-		HRESULT hr = d3dDevice->CreatePixelShader(this->GetByteCode(), this->GetSizeInBytes(), ur_null, this->d3dPixelShader);
+		ID3D11PixelShader *pPixelShader = nullptr;
+		HRESULT hr = d3dDevice->CreatePixelShader(this->GetByteCode(), this->GetSizeInBytes(), nullptr, &pPixelShader);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsPixelShaderD3D11: failed to create shader");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pD3DPixelShader.reset( pPixelShader );
+		}
 
 		return Result(Success);
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsInputLayoutD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	GraphicsInputLayoutD3D11::GraphicsInputLayoutD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsInputLayout(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsInputLayoutD3D11                                             */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsInputLayoutD3D11::GraphicsInputLayoutD3D11(GraphicsSystem &system) :
+		GraphicsInputLayout(system)
 	{
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsInputLayoutD3D11::~GraphicsInputLayoutD3D11()
 	{
 	}
 
-	Result GraphicsInputLayoutD3D11::OnInitialize(const GraphicsShader &shader, const GraphicsInputElement *elements, ur_uint count)
+	//------------------------------------------------------------------------
+	Result GraphicsInputLayoutD3D11::OnInitialize(const GraphicsShader &shader, const GraphicsInputElement *elements, uint32 count)
 	{
-		this->d3dInputLayout.reset(ur_null);
+		m_pD3DInputLayout = nullptr;
 
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsInputLayoutD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> d3dElements(count);
 		const GraphicsInputElement *GraphicsElement = elements;
@@ -1043,93 +1133,134 @@ namespace Graphics
 			d3dElement = GraphicsInputElementToD3D11(*GraphicsElement++);
 		}
 
-		HRESULT hr = d3dDevice->CreateInputLayout(d3dElements.data(), count, shader.GetByteCode(), shader.GetSizeInBytes(), this->d3dInputLayout);
+		ID3D11InputLayout *pInputLayout = nullptr;
+		HRESULT hr = d3dDevice->CreateInputLayout(d3dElements.data(), count, shader.GetByteCode(), shader.GetSizeInBytes(), &pInputLayout);
 		if (FAILED(hr))
-			return ResultError(Failure, "GraphicsInputLayoutD3D11: failed to create input layout");
+		{
+			return Result(Failure);
+		}
+		else
+		{
+			m_pD3DInputLayout.reset(pInputLayout);
+		}
 
 		return Result(Success);
 	}
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// GraphicsPipelineStateD3D11
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	GraphicsPipelineStateD3D11::GraphicsPipelineStateD3D11(GraphicsSystem &GraphicsSystem) :
-		GraphicsPipelineState(GraphicsSystem)
+	/************************************************************************/
+	/* GraphicsPipelineStateD3D11                                           */
+	/************************************************************************/
+	//------------------------------------------------------------------------
+	GraphicsPipelineStateD3D11::GraphicsPipelineStateD3D11(GraphicsSystem &system) :
+		GraphicsPipelineState(system)
 	{
-		memset(this->hashSamplerState, 0, sizeof(this->hashSamplerState));
-		this->hashRasterizerState = 0;
-		this->hashDepthStencilState = 0;
-		this->hashBlendState = 0;
+		memset(m_hashSamplerState, 0, sizeof(m_hashSamplerState));
+		m_hashRasterizerState = 0;
+		m_hashDepthStencilState = 0;
+		m_hashBlendState = 0;
 	}
 
+	//------------------------------------------------------------------------
 	GraphicsPipelineStateD3D11::~GraphicsPipelineStateD3D11()
 	{
 	}
 
+	//------------------------------------------------------------------------
 	Result GraphicsPipelineStateD3D11::OnSetRenderState(const GraphicsRenderState &renderState)
 	{
 		GraphicsSystemD3D11 &d3dSystem = static_cast<GraphicsSystemD3D11&>(this->GetGraphicsSystem());
 		ID3D11Device *d3dDevice = d3dSystem.GetDevice();
-		if (ur_null == d3dDevice)
-			return ResultError(NotInitialized, "GraphicsPipelineStateD3D11: failed to initialize, device not ready");
+		if (d3dDevice == nullptr)
+			return Result(NotInitialized);
 
 		// SamplerState
-		for (ur_uint i = 0; i < GraphicsRenderState::MaxSamplerStates; ++i)
+		for (uint32 i = 0; i < GraphicsRenderState::MaxSamplerStates; ++i)
 		{
-			ur_size hash = ComputeHash((const ur_byte*)&renderState.SamplerState[i], sizeof(renderState.SamplerState[i]));
-			if (this->hashSamplerState[i] != hash)
+			size_t hash = ComputeHash((const cbyte*)&renderState.SamplerState[i], sizeof(renderState.SamplerState[i]));
+			if (m_hashSamplerState[i] != hash)
 			{
-				this->hashSamplerState[i] = hash;
-				this->d3dSamplerState[i].reset(ur_null);
+				m_hashSamplerState[i] = hash;
+				m_pD3DSamplerState[i] = nullptr;
 				D3D11_SAMPLER_DESC desc = GraphicsSamplerStateToD3D11(renderState.SamplerState[i]);
-				HRESULT hr = d3dDevice->CreateSamplerState(&desc, this->d3dSamplerState[i]);
+
+				ID3D11SamplerState *pDamplerState = nullptr;
+				HRESULT hr = d3dDevice->CreateSamplerState(&desc, &pDamplerState);
 				if (FAILED(hr))
-					return ResultError(Failure, "GraphicsPipelineStateD3D11: failed to create sampler state object");
+				{
+					return Result(Failure);
+				}
+				else
+				{
+					m_pD3DSamplerState[i].reset(pDamplerState);
+				}
 			}
 		}
 
 		// RasterizerState
-		ur_size hash = ComputeHash((const ur_byte*)&renderState.RasterizerState, sizeof(renderState.RasterizerState));
-		if (this->hashRasterizerState != hash)
+		size_t hash = ComputeHash((const cbyte*)&renderState.RasterizerState, sizeof(renderState.RasterizerState));
+		if (m_hashRasterizerState != hash)
 		{
-			this->hashRasterizerState = hash;
-			this->d3dRasterizerState.reset(ur_null);
+			m_hashRasterizerState = hash;
+			m_pD3DRasterizerState = nullptr;
 			D3D11_RASTERIZER_DESC desc = GraphicsRasterizerStateToD3D11(renderState.RasterizerState);
-			HRESULT hr = d3dDevice->CreateRasterizerState(&desc, this->d3dRasterizerState);
+
+			ID3D11RasterizerState *pRasterizerState = nullptr;
+			HRESULT hr = d3dDevice->CreateRasterizerState(&desc, &pRasterizerState);
 			if (FAILED(hr))
-				return ResultError(Failure, "GraphicsPipelineStateD3D11: failed to create rasterizer state object");
+			{
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DRasterizerState.reset(pRasterizerState);
+			}
 		}
 
 		// DepthStencilState
-		hash = ComputeHash((const ur_byte*)&renderState.DepthStencilState, sizeof(renderState.DepthStencilState));
-		if (this->hashDepthStencilState != hash)
+		hash = ComputeHash((const cbyte*)&renderState.DepthStencilState, sizeof(renderState.DepthStencilState));
+		if (m_hashDepthStencilState != hash)
 		{
-			this->hashDepthStencilState = hash;
-			this->d3dDepthStencilState.reset(ur_null);
+			m_hashDepthStencilState = hash;
+			m_pD3DDepthStencilState = nullptr;
 			D3D11_DEPTH_STENCIL_DESC desc = GraphicsDepthStencilStateToD3D11(renderState.DepthStencilState);
-			HRESULT hr = d3dDevice->CreateDepthStencilState(&desc, this->d3dDepthStencilState);
+
+			ID3D11DepthStencilState *pDepthState = nullptr;
+			HRESULT hr = d3dDevice->CreateDepthStencilState(&desc, &pDepthState);
 			if (FAILED(hr))
-				return ResultError(Failure, "GraphicsPipelineStateD3D11: failed to create depth stencil state object");
+			{
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DDepthStencilState.reset(pDepthState);
+			}
 		}
 
 		// BlendState
-		hash = ComputeHash((const ur_byte*)&renderState.BlendState, sizeof(renderState.BlendState));
-		if (this->hashBlendState != hash)
+		hash = ComputeHash((const cbyte*)&renderState.BlendState, sizeof(renderState.BlendState));
+		if (m_hashBlendState != hash)
 		{
-			this->hashBlendState = hash;
-			this->d3dBlendState.reset(ur_null);
+			m_hashBlendState = hash;
+			m_pD3DBlendState = nullptr;
 			D3D11_BLEND_DESC desc;
 			desc.AlphaToCoverageEnable = false;
 			desc.IndependentBlendEnable = true;
-			for (ur_uint irt = 0; irt < GraphicsRenderState::MaxRenderTargets; ++irt)
+			for (uint8 irt = 0; irt < GraphicsRenderState::MaxRenderTargets; ++irt)
 			{
 				desc.RenderTarget[irt] = GraphicsBlendStateToD3D11(renderState.BlendState[irt]);
 			}
-			HRESULT hr = d3dDevice->CreateBlendState(&desc, this->d3dBlendState);
+
+			ID3D11BlendState *pBlendState = nullptr;
+			HRESULT hr = d3dDevice->CreateBlendState(&desc, &pBlendState);
 			if (FAILED(hr))
-				return ResultError(Failure, "GraphicsPipelineStateD3D11: failed to create blend state object");
+			{
+				return Result(Failure);
+			}
+			else
+			{
+				m_pD3DBlendState.reset(pBlendState);
+			}
 		}
 
 		return Result(Success);
@@ -1139,8 +1270,8 @@ namespace Graphics
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Utilities
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	static DXGI_FORMAT GraphicsFormatToDXGI_LUT[ur_uint(GraphicsFormat::Count)][ur_uint(GraphicsFormatView::Count)] = {
+	//------------------------------------------------------------------------
+	static DXGI_FORMAT GraphicsFormatToDXGI_LUT[uint32(GraphicsFormat::Count)][uint32(GraphicsFormatView::Count)] = {
 		// Typeless, Unorm, Snorm, Uint, Sint, Float,
 		// Unknown
 		{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN },
@@ -1196,12 +1327,14 @@ namespace Graphics
 		{ DXGI_FORMAT_BC7_TYPELESS, DXGI_FORMAT_BC7_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN }
 	};
 
+	//------------------------------------------------------------------------
 	DXGI_FORMAT GraphicsFormatToDXGI(GraphicsFormat fmt, GraphicsFormatView view)
 	{
-		return GraphicsFormatToDXGI_LUT[ur_uint(fmt)][ur_uint(view)];
+		return GraphicsFormatToDXGI_LUT[uint32(fmt)][uint32(view)];
 	}
 
-	DXGI_FORMAT GraphicsBitsPerIndexToDXGIFormat(ur_uint bitsPerIndex)
+	//------------------------------------------------------------------------
+	DXGI_FORMAT GraphicsBitsPerIndexToDXGIFormat(uint32 bitsPerIndex)
 	{
 		switch (bitsPerIndex)
 		{
@@ -1211,21 +1344,25 @@ namespace Graphics
 		return DXGI_FORMAT_UNKNOWN;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_USAGE GraphicsUsageToD3D11(GraphicsUsage usage)
 	{
 		return (D3D11_USAGE)usage;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_BIND_FLAG GraphicsBindFlagToD3D11(GraphicsBindFlag flag)
 	{
 		return (D3D11_BIND_FLAG)flag;
 	}
 
-	UINT GraphicsBindFlagsToD3D11(ur_uint flags)
+	//------------------------------------------------------------------------
+	UINT GraphicsBindFlagsToD3D11(uint32 flags)
 	{
 		return (UINT)flags;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_CPU_ACCESS_FLAG GraphicsAccessFlagToD3D11_CPUAccessFlag(GraphicsAccessFlag flag)
 	{
 		switch (flag)
@@ -1236,14 +1373,16 @@ namespace Graphics
 		return (D3D11_CPU_ACCESS_FLAG)0;
 	}
 
-	UINT GraphicsAccessFlagsToD3D11_CPUAccessFlags(ur_uint flags)
+	//------------------------------------------------------------------------
+	UINT GraphicsAccessFlagsToD3D11_CPUAccessFlags(uint32 flags)
 	{
 		UINT d3dFlags = 0;
-		if (flags & (ur_uint)GraphicsAccessFlag::Write) d3dFlags |= D3D11_CPU_ACCESS_WRITE;
-		if (flags & (ur_uint)GraphicsAccessFlag::Read) d3dFlags |= D3D11_CPU_ACCESS_READ;
+		if (flags & (uint32)GraphicsAccessFlag::Write) d3dFlags |= D3D11_CPU_ACCESS_WRITE;
+		if (flags & (uint32)GraphicsAccessFlag::Read) d3dFlags |= D3D11_CPU_ACCESS_READ;
 		return (UINT)d3dFlags;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_MAP GraphicsGPUAccessFlagToD3D11(GraphicsGPUAccess gpuAccess)
 	{
 		switch (gpuAccess)
@@ -1257,6 +1396,7 @@ namespace Graphics
 		return (D3D11_MAP)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_VIEWPORT GraphicsViewPortToD3D11(const GraphicsViewPort &viewPort)
 	{
 		D3D11_VIEWPORT d3dViewPort;
@@ -1269,7 +1409,8 @@ namespace Graphics
 		return d3dViewPort;
 	}
 
-	D3D11_RECT RectIToD3D11(const RectI &rect)
+	//------------------------------------------------------------------------
+	D3D11_RECT RectIToD3D11(const Rect &rect)
 	{
 		D3D11_RECT d3dRect;
 		d3dRect.left = (LONG)rect.Min.x;
@@ -1279,6 +1420,7 @@ namespace Graphics
 		return d3dRect;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_TEXTURE2D_DESC GraphicsTextureDescToD3D11(const GraphicsTextureDesc &desc)
 	{
 		D3D11_TEXTURE2D_DESC d3dDesc;
@@ -1296,6 +1438,7 @@ namespace Graphics
 		return d3dDesc;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_BUFFER_DESC GraphicsBufferDescToD3D11(const GraphicsBufferDesc &desc)
 	{
 		D3D11_BUFFER_DESC d3dDesc;
@@ -1308,6 +1451,7 @@ namespace Graphics
 		return d3dDesc;
 	}
 
+	//------------------------------------------------------------------------
 	LPCSTR GraphicsSemanticToD3D11(GraphicsSemantic semantic)
 	{
 		switch (semantic)
@@ -1322,6 +1466,7 @@ namespace Graphics
 		return "UNKNOWN";
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_INPUT_ELEMENT_DESC GraphicsInputElementToD3D11(const GraphicsInputElement &element)
 	{
 		D3D11_INPUT_ELEMENT_DESC d3dElement;
@@ -1335,6 +1480,7 @@ namespace Graphics
 		return d3dElement;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_PRIMITIVE_TOPOLOGY GraphicsPrimitiveTopologyToD3D11(GraphicsPrimitiveTopology topology)
 	{
 		switch (topology)
@@ -1348,6 +1494,7 @@ namespace Graphics
 		return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_RENDER_TARGET_BLEND_DESC GraphicsBlendStateToD3D11(const GraphicsBlendState &state)
 	{
 		D3D11_RENDER_TARGET_BLEND_DESC desc;
@@ -1362,6 +1509,7 @@ namespace Graphics
 		return desc;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_BLEND GraphicsBlendFactorToD3D11(GraphicsBlendFactor blendFactor)
 	{
 		switch (blendFactor)
@@ -1380,6 +1528,7 @@ namespace Graphics
 		return D3D11_BLEND(0);
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_BLEND_OP GraphicsBlendOpToD3D11(GraphicsBlendOp blendOp)
 	{
 		switch (blendOp)
@@ -1393,6 +1542,7 @@ namespace Graphics
 		return D3D11_BLEND_OP(0);
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_COMPARISON_FUNC GraphicsCmpFuncToD3D11(GraphicsCmpFunc func)
 	{
 		switch (func)
@@ -1409,6 +1559,7 @@ namespace Graphics
 		return (D3D11_COMPARISON_FUNC)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_FILTER GraphicsFilterToD3D11(GraphicsFilter minFilter, GraphicsFilter magFilter, GraphicsFilter mipFilter)
 	{
 		if (GraphicsFilter::Point == minFilter && GraphicsFilter::Point == magFilter && GraphicsFilter::Point == magFilter) return D3D11_FILTER_MIN_MAG_MIP_POINT;
@@ -1423,6 +1574,7 @@ namespace Graphics
 		return (D3D11_FILTER)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_TEXTURE_ADDRESS_MODE GraphicsTextureAddressModeToD3D11(GraphicsTextureAddressMode mode)
 	{
 		switch (mode)
@@ -1436,6 +1588,7 @@ namespace Graphics
 		return (D3D11_TEXTURE_ADDRESS_MODE)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_SAMPLER_DESC GraphicsSamplerStateToD3D11(const GraphicsSamplerState &state)
 	{
 		D3D11_SAMPLER_DESC desc;
@@ -1455,6 +1608,7 @@ namespace Graphics
 		return desc;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_FILL_MODE GraphicsFillModeToD3D11(GraphicsFillMode mode)
 	{
 		switch (mode)
@@ -1465,6 +1619,7 @@ namespace Graphics
 		return (D3D11_FILL_MODE)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_CULL_MODE GraphicsCullModeToD3D11(GraphicsCullMode mode)
 	{
 		switch (mode)
@@ -1476,6 +1631,7 @@ namespace Graphics
 		return (D3D11_CULL_MODE)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_RASTERIZER_DESC GraphicsRasterizerStateToD3D11(const GraphicsRasterizerState& state)
 	{
 		D3D11_RASTERIZER_DESC desc;
@@ -1492,6 +1648,7 @@ namespace Graphics
 		return desc;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_STENCIL_OP GraphicsStencilOpToD3D11(GraphicsStencilOp stencilOp)
 	{
 		switch (stencilOp)
@@ -1508,6 +1665,7 @@ namespace Graphics
 		return (D3D11_STENCIL_OP)0;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_DEPTH_STENCILOP_DESC GraphicsDepthStencilOpDescToD3D11(const GraphicsDepthStencilOpDesc& GraphicsDesc)
 	{
 		D3D11_DEPTH_STENCILOP_DESC desc;
@@ -1518,6 +1676,7 @@ namespace Graphics
 		return desc;
 	}
 
+	//------------------------------------------------------------------------
 	D3D11_DEPTH_STENCIL_DESC GraphicsDepthStencilStateToD3D11(const GraphicsDepthStencilState &state)
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;

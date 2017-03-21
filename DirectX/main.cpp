@@ -30,23 +30,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	input->initialize();
 	App::instance()->input(input);
 
-	// create gfx system
-	std::unique_ptr<GfxSystemD3D11> gfx(new GfxSystemD3D11(realm));
-	Result res = gfx->Initialize(realm.GetCanvas());
-	realm.SetGfxSystem(std::move(gfx));
+	// create Graphics system
+	std::unique_ptr<GraphicsSystemD3D11> Graphics(new GraphicsSystemD3D11(realm));
+	Result res = Graphics->Initialize(realm.GetCanvas());
+	realm.SetGraphicsSystem(std::move(Graphics));
 
 	// create swap chain
-	std::unique_ptr<GfxSwapChain> gfxSwapChain;
-	if (Succeeded(realm.GetGfxSystem()->CreateSwapChain(gfxSwapChain)))
+	std::unique_ptr<GraphicsSwapChain> GraphicsSwapChain;
+	if (Succeeded(realm.GetGraphicsSystem()->CreateSwapChain(GraphicsSwapChain)))
 	{
-		res = gfxSwapChain->Initialize(screenWidth, screenHeight);
+		res = GraphicsSwapChain->Initialize(screenWidth, screenHeight);
 	}
 
-	// create gfx context
-	std::unique_ptr<GfxContext> gfxContext;
-	if (Succeeded(realm.GetGfxSystem()->CreateContext(gfxContext)))
+	// create Graphics context
+	std::unique_ptr<GraphicsContext> GraphicsContext;
+	if (Succeeded(realm.GetGraphicsSystem()->CreateContext(GraphicsContext)))
 	{
-		res = gfxContext->Initialize();
+		res = GraphicsContext->Initialize();
 	}
 
 	// initialize ImguiRender

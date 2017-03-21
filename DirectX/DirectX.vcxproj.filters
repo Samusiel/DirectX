@@ -37,9 +37,15 @@
     <ClCompile Include="RenderStates\Camera.cpp">
       <Filter>RenderStates</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsInterface\D3DDevice.cpp" />
-    <ClCompile Include="Graphics\GraphicsSystem.cpp" />
-    <ClCompile Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.cpp" />
+    <ClCompile Include="Graphics\GraphicsSystem.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.cpp">
+      <Filter>Graphics\GraphicsD3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GraphicsTypes.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Model.h" />
@@ -84,9 +90,16 @@
     <ClInclude Include="Math\Defs.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsInterface\D3DDevice.h" />
-    <ClInclude Include="Graphics\GraphicsSystem.hpp" />
-    <ClInclude Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp" />
+    <ClInclude Include="Graphics\GraphicsSystem.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GraphicsD3D11\GraphicsSystemD3D11.hpp">
+      <Filter>Graphics\GraphicsD3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Types.hpp" />
+    <ClInclude Include="Graphics\GraphicsTypes.hpp">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DirectX.rc" />
@@ -128,6 +141,9 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{8f9fc76f-5842-401b-b888-f40757a4613e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\GraphicsD3D11">
+      <UniqueIdentifier>{066990c4-2532-4edd-b132-437ed0ef57bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

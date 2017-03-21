@@ -6,9 +6,15 @@
 #include <algorithm>
 #include <vector>
 
-#include "directxmath.h"
-#include "Math/Defs.h"
-#include "Math/Matrix.h"
-#include "System/Result.hpp"
 #include <memory.h>
 #include <mutex>
+
+#include "System/Types.hpp"
+#include "System/Result.hpp"
+using namespace System;
+
+#include "Math/Defs.h"
+#include "Math/Matrix.h"
+using namespace Math;
+
+#include "Graphics/GraphicsTypes.hpp"
